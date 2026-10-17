@@ -18,6 +18,10 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 ![My shift](docs/screenshot-shift.png)
 
 **My shift**
+- **The floor:** beds laid out like the wing, the way a restaurant host sees tables. Each bed's color says what it needs: teal breathes slowly for "needs you now" (an open pass not logged), green for caught up, coral for a missed pass, a dot for flagged, dashed for an open bed. Tap a bed to work it. (The layout and the twelve beds are made up.)
+
+![The floor](docs/screenshot-floor.png)
+
 - **One line that matters now:** "2 clients haven't come for the 12pm pass yet: Robert, Dolores."
 - **Med pass board:** rooms by pass times. Tap a cell: *Took it, I watched* / *Didn't come* / *Side effect*. That tap is the med log.
 - **Go find:** who to chase for the open pass, and who missed earlier.

@@ -144,8 +144,41 @@
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:var(--mist);padding:12px 18px;border-radius:999px;font-weight:700;opacity:0;transition:.2s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%)}
 
+  /* the floor */
+  .floor{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:6px 0 4px;min-width:0}
+  @media(min-width:560px){.floor{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr)}}
+  @media(max-width:559px){.floor .aisle{display:none}}
+  .floor .side{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-content:start;min-width:0}
+  @media(min-width:560px) and (max-width:979px){.floor .side{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .floor .aisle{background:repeating-linear-gradient(to bottom,var(--rule) 0 6px,transparent 6px 14px);width:2px;justify-self:center;border-radius:2px}
+  .bed{position:relative;min-height:96px;height:100%;border-radius:18px 18px 12px 12px;background:var(--mist);border:3px solid var(--rule);padding:8px 8px 6px;display:grid;grid-template-rows:auto 1fr auto;text-align:left;color:var(--ink);min-height:0;min-width:0;width:100%;overflow:hidden}
+  .bed::before{content:"";position:absolute;left:12px;right:12px;top:7px;height:7px;border-radius:4px;background:var(--rule);opacity:.9}
+  .bed .no{font-size:11px;font-weight:800;color:var(--ink-2);margin-top:6px;white-space:nowrap;display:flex;justify-content:space-between}
+  
+  .bed .nm{font-size:16px;padding:2px 0;font-weight:800;line-height:1.1;align-self:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bed .marks{display:flex;gap:2px;align-items:center;min-height:16px;overflow:hidden}
+  .bed .marks svg{width:14px;height:14px;color:var(--ink-2)}
+  .bed .marks .m.on{color:var(--sage)}
+  .bed .marks .pillcount{font-size:11px;font-weight:800;color:var(--ink-2);margin-left:auto}
+  .bed.open{border-style:dashed;background:transparent;color:var(--ink-2)} .bed.open::before{opacity:.35} .bed.open .nm{font-size:14px;font-weight:700;color:var(--ink-2)}
+  .bed.due{border-color:var(--teal);background:var(--teal-2);animation:breathe 2.6s ease-in-out infinite}
+  .bed.ok{border-color:var(--sage);background:var(--sage-2)}
+  .bed.miss{border-color:var(--coral);background:var(--coral-2)}
+  .bed.flag::after,.bed.ready::after{content:"";position:absolute;right:8px;bottom:8px;width:12px;height:12px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px var(--paper)}
+  .bed.ready::after{background:var(--teal)}
+  .bed.flag.ready::after{background:linear-gradient(90deg,var(--amber) 50%,var(--teal) 50%)}
+  .bed.settle{animation:settle .5s ease-out 1}
+  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(31,111,120,.0)}50%{box-shadow:0 0 0 6px rgba(31,111,120,.18)}}
+  @keyframes settle{0%{transform:scale(1.04)}100%{transform:scale(1)}}
+  @media(prefers-reduced-motion:reduce){.bed.due,.bed.settle{animation:none}}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2);margin-top:8px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend .k{width:14px;height:14px;border-radius:5px;border:2px solid var(--rule);display:inline-block}
+  .legend .k.due{border-color:var(--teal);background:var(--teal-2)} .legend .k.ok{border-color:var(--sage);background:var(--sage-2)} .legend .k.miss{border-color:var(--coral);background:var(--coral-2)} .legend .k.flag{background:var(--amber);border-color:var(--amber)} .legend .k.open{border-style:dashed}
+  @media(min-width:980px){.floor .side{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
   /* my shift */
-  .home{display:grid;gap:14px}
+  .home{display:grid;gap:14px;min-width:0} .home>*{min-width:0}
   .panel{background:var(--paper);border-radius:var(--r);padding:16px}
   .ph{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
   .ph h2{margin:0;font-size:20px;font-weight:800}
@@ -234,6 +267,13 @@
 
     <section class="home" id="home">
       <div class="insight" id="insight"></div>
+      <div class="panel floorpanel">
+        <div class="ph"><h2>The floor</h2><span class="muted">tap a bed</span></div>
+        <div class="floor" id="floor"></div>
+        <div class="legend">
+          <span><i class="k due"></i>needs you now</span><span><i class="k ok"></i>caught up</span><span><i class="k miss"></i>missed a pass</span><span><i class="k flag"></i>flagged</span><span><i class="k open"></i>open bed</span>
+        </div>
+      </div>
       <div class="panel">
         <div class="ph"><h2>Med pass</h2><span class="muted" id="passClock"></span></div>
         <div class="passgrid" id="passgrid"></div>
@@ -737,7 +777,31 @@
   const isOpen=p=>new Date().getHours()>=PASS_START[p];
   const latestOpen=()=>allPasses().filter(isOpen).slice(-1)[0];
   const logOf=(c,p)=>(S.log[c.id]||{})[p];
-  function goHome(){ S.client=null; S.draft=null; S.selCell=null; $('#cols').hidden=true; $('#home').hidden=false; renderBoard(); renderHome(); window.scrollTo({top:0}); }
+  function goHome(){ S.client=null; S.draft=null; S.selCell=null; $('#cols').hidden=true; $('#home').hidden=false; $('#board').hidden=true; renderBoard(); renderHome(); window.scrollTo({top:0}); }
+
+  // the floor: one wing, beds in two rows of a dorm with an aisle. Made-up layout.
+  const FLOOR={left:[{bed:'1'},{bed:'2',client:'marcus'},{bed:'3'},{bed:'4',client:'robert'},{bed:'5'},{bed:'6'}],right:[{bed:'7',client:'dolores'},{bed:'8'},{bed:'9'},{bed:'10'},{bed:'11'},{bed:'12'}]};
+  function bedState(c){
+    const open=(c.passes||[]).filter(isOpen); const f=S.flags[c.id]||{};
+    const missed=open.some(p=>logOf(c,p)==='missed'); const pending=open.some(p=>!logOf(c,p));
+    const cls=missed?'miss':pending?'due':'ok';
+    return {cls,flag:f.doctor||open.some(p=>logOf(c,p)==='side'),ready:f.ready,took:open.filter(p=>logOf(c,p)).length,open:open.length,vitals:!!f.vitals,note:!!S.done[c.id]};
+  }
+  let lastStates={};
+  function renderFloor(){
+    const side=beds=>`<div class="side">${beds.map(b=>{
+      const c=b.client&&S.clients.find(x=>x.id===b.client);
+      if(!c) return `<button class="bed open" aria-label="bed ${b.bed}, open"><span class="no">Bed ${b.bed}</span><span class="nm">open</span><span class="marks"></span></button>`;
+      const st=bedState(c); const settled=lastStates[c.id]&&lastStates[c.id]!==st.cls&&st.cls!=='due'; lastStates[c.id]=st.cls;
+      const name=c.display.split(' · ')[0];
+      return `<button class="bed ${st.cls} ${st.flag?'flag':''} ${st.ready?'ready':''} ${settled?'settle':''}" data-bed="${c.id}" aria-label="bed ${b.bed}, ${esc(name)}, ${st.cls==='due'?'needs you':st.cls==='miss'?'missed a pass':'caught up'}">
+        <span class="no">Bed ${b.bed}<span>${st.took}/${st.open}</span></span><span class="nm">${esc(name)}</span>
+        <span class="marks"><span class="m ${st.vitals?'on':''}" title="vitals">${svg('heart')}</span><span class="m ${st.note?'on':''}" title="note">${svg('note')}</span>${(c.appointments||[]).length?`<span class="m" title="appointment">${svg('next')}</span>`:''}</span>
+      </button>`; }).join('')}</div>`;
+    const el=$('#floor'); el.innerHTML=side(FLOOR.left)+'<div class="aisle"></div>'+side(FLOOR.right);
+    el.querySelectorAll('[data-bed]').forEach(b=>b.onclick=()=>pick(S.clients.find(c=>c.id===b.dataset.bed)));
+    el.querySelectorAll('.bed.open').forEach(b=>b.onclick=()=>toast('Open bed. Nobody here yet.'));
+  }
   $('#backHome').onclick=goHome;
   function renderHome(){
     const passes=allPasses(); const cur=latestOpen();
@@ -750,6 +814,7 @@
     else if(pending.length) ins=`${pending.length===1?'1 client hasn\'t':pending.length+' clients haven\'t'} come for the ${cur} pass yet: ${pending.map(c=>c.display.split(' · ')[0]).join(', ')}.`;
     else { ins=`Everyone is logged for the ${cur} pass.${missedToday.length?` ${missedToday.length} missed earlier today.`:' Nice.'}`; calm=!missedToday.length; }
     const el=$('#insight'); el.textContent=ins; el.className='insight'+(calm?' calm':'');
+    renderFloor();
     $('#passClock').textContent=cur?`${cur} pass is open`:'';
     // grid
     const g=$('#passgrid'); g.style.setProperty('--np',passes.length);
@@ -818,9 +883,9 @@
       el.innerHTML=`<b>${esc(room.replace('Room ','Rm '))}</b><span>${esc(name)}</span>`; el.onclick=()=>pick(c); b.appendChild(el);
     });
     const dots=$('#dots'); dots.innerHTML=S.clients.map(c=>`<i class="${S.done[c.id]?'on':''}"></i>`).join('');
-    const n=Object.keys(S.done).filter(k=>S.done[k]).length; $('#sub').textContent = n? `${n} of ${S.clients.length} noted at the time today.` : 'Pick a room to start.';
+    const n=Object.keys(S.done).filter(k=>S.done[k]).length; $('#sub').textContent = n? `${n} of ${S.clients.length} noted at the time today.` : 'Here is your floor. Tap a bed to work it.';
   }
-  function pick(c){ S.client=c; S.lines=[]; S.draft=null; S.dec={}; S.open=null; $('#home').hidden=true; $('#cols').hidden=false; renderBoard(); renderWho(); renderTiles(); renderLines(); renderDraft(); window.scrollTo({top:0}); }
+  function pick(c){ S.client=c; S.lines=[]; S.draft=null; S.dec={}; S.open=null; $('#home').hidden=true; $('#cols').hidden=false; $('#board').hidden=false; renderBoard(); renderWho(); renderTiles(); renderLines(); renderDraft(); window.scrollTo({top:0}); }
   function renderWho(){ const [name]=S.client.display.split(' · '); $('#whoName').textContent=S.client.display; $('#whoSum').textContent=S.client.summary;
     $('#goalrow').innerHTML=S.client.goals.map(g=>`<span class="goal" title="${esc(g.text)}">${svg(iconFor(g.text,''))}<span>${esc(g.id)} · ${esc(g.text.length>34?g.text.slice(0,34)+'…':g.text)}</span></span>`).join(''); }
   function renderTiles(){ $('#tiles').innerHTML=TILES.map(t=>`<button class="tile" data-tile="${t.id}" aria-expanded="${S.open===t.id}">${svg(t.icon)}<span>${esc(t.label)}</span></button>`).join('');
