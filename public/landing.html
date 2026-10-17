@@ -6,11 +6,16 @@
 <title>Rounds</title>
 <meta name="description" content="The shift on one screen for recuperative care nurses. You tap. You sign.">
 <meta name="theme-color" content="#0B0D0B">
+<script>(function(){try{var t=localStorage.getItem("rounds.theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{--mist:#0B0D0B;--paper:#151815;--ink:#F2F5F0;--ink-2:#A6AEA2;--rule:#2A2F29;--teal:#81E40A;--teal-2:#1A2B0E;--on-teal:#0B0D0B;--hl:#81E40A;--hl-ink:#0B0D0B;--coral:#FF6B5E;--coral-2:#3A1C19;--amber:#F2B84B;--sage:#D6DBD2;--sage-2:#222722;--r:16px}
+  :root[data-theme="light"]{--mist:#F6F8F4;--paper:#FFFFFF;--ink:#0B0D0B;--ink-2:#5B655A;--rule:#DCE3D9;--teal:#5FAE00;--teal-2:#EAF8DA;--on-teal:#0B0D0B;--hl:#81E40A;--hl-ink:#0B0D0B;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--amber-2:#FBF1DC;--sage:#4B554A;--sage-2:#ECEFEA}
+  :root[data-theme="light"] .insight,:root[data-theme="light"] .go,:root[data-theme="light"] .btn.main,:root[data-theme="light"] .add,:root[data-theme="light"] .mic,:root[data-theme="light"] .gatebox button.main,:root[data-theme="light"] .logo{background:#81E40A;color:#0B0D0B}
+  .themeBtn{min-height:40px;height:40px;width:40px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);display:grid;place-items:center;color:var(--ink);cursor:pointer;padding:0}
+  .themeBtn svg{width:20px;height:20px}
   *{box-sizing:border-box} [hidden]{display:none!important}
   body{margin:0;background:var(--mist);color:var(--ink);font:500 17px/1.55 "Nunito",system-ui,sans-serif}
   .wrap{max-width:1040px;margin:0 auto;padding:0 16px 60px}
@@ -70,7 +75,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header><div class="logo"><svg viewBox="0 0 64 64"><path d="M18 20h20M18 30h28M18 40h16" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round"/><path d="M40 40l6 6 10-12" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><b>Rounds</b><br><span>for recuperative care</span></div></header>
+  <header><div class="logo"><svg viewBox="0 0 64 64"><path d="M18 20h20M18 30h28M18 40h16" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round"/><path d="M40 40l6 6 10-12" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><b>Rounds</b><br><span>for recuperative care</span></div><span style="margin-left:auto"><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span></header>
 
   <section class="hero">
     <div>
@@ -137,5 +142,6 @@
   document.getElementById('gGo').onclick=go; code.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); if(e.key==='Escape') gate.hidden=true; });
 })();
 </script>
+<script>(function(){var b=document.getElementById("themeBtn");if(!b)return;b.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rounds.theme",cur);}catch(e){}};})();</script>
 </body>
 </html>

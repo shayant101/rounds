@@ -7,6 +7,7 @@
 <meta name="description" content="You jot. It drafts. You sign.">
 <meta name="theme-color" content="#0B0D0B">
 
+<script>(function(){try{var t=localStorage.getItem("rounds.theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%230B0D0B%22%2F%3E%3Cpath%20d%3D%22M18%2020h20M18%2030h28M18%2040h16%22%20stroke%3D%22%2381E40A%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%2040l6%206%2010-12%22%20stroke%3D%22%2381E40A%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E%0A">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,6 +23,10 @@
     --ui:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
     --note:"Atkinson Hyperlegible",system-ui,sans-serif;
   }
+  :root[data-theme="light"]{--mist:#F6F8F4;--paper:#FFFFFF;--ink:#0B0D0B;--ink-2:#5B655A;--rule:#DCE3D9;--teal:#5FAE00;--teal-2:#EAF8DA;--on-teal:#0B0D0B;--hl:#81E40A;--hl-ink:#0B0D0B;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--amber-2:#FBF1DC;--sage:#4B554A;--sage-2:#ECEFEA}
+  :root[data-theme="light"] .insight,:root[data-theme="light"] .go,:root[data-theme="light"] .btn.main,:root[data-theme="light"] .add,:root[data-theme="light"] .mic,:root[data-theme="light"] .gatebox button.main,:root[data-theme="light"] .logo{background:#81E40A;color:#0B0D0B}
+  .themeBtn{min-height:40px;height:40px;width:40px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);display:grid;place-items:center;color:var(--ink);cursor:pointer;padding:0}
+  .themeBtn svg{width:20px;height:20px}
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   html{-webkit-text-size-adjust:100%}
@@ -315,7 +320,7 @@
   <div id="app" hidden>
     <div class="top">
       <div><h1 id="greet">Good morning</h1><p id="sub">Pick a room to start.</p></div>
-      <div class="dots" id="dots" aria-label="rooms noted today"></div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="dots" id="dots" aria-label="rooms noted today"></div><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
     </div>
     <div class="board" id="board" role="tablist"></div>
 
@@ -1333,5 +1338,6 @@
   function fb(t,ok){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy')}catch(e){}ta.remove();ok();}
 })();
 </script>
+<script>(function(){function flip(){var cur=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rounds.theme",cur);}catch(e){}}var b2=document.getElementById("themeBtn2");if(b2)b2.onclick=flip;var b=document.getElementById("themeBtn");if(!b)return;b.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rounds.theme",cur);}catch(e){}};})();</script>
 </body>
 </html>
