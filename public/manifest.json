@@ -4,7 +4,7 @@
   "description": "You jot. It drafts. You sign.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F3F6F5",
-  "theme_color": "#1F6F78",
+  "background_color": "#0B0D0B",
+  "theme_color": "#81E40A",
   "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
 }

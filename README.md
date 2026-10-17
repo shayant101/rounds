@@ -58,7 +58,7 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 ### Why it looks the way it does
 
 - Nunito for the interface (rounded, big x-height, reads at a glance); Atkinson Hyperlegible for the note text itself, a face designed for legibility. No handwriting font: nurses read fast under bad light.
-- One brand color (scrub teal), highlighter yellow for the trace, coral only for "not your words". 48px touch targets, one-hand phone layout.
+- Brand from our designer: black base, one brand green `#81E40A` for actions, "needs you now" and the highlighter trace. Coral only for "not your words" or a missed pass; amber for a flag; a quiet grey for caught up, so nothing competes with the green. 48px touch targets, one-hand phone layout.
 - Two motions only: the lines sliding into the note, and the highlighter. Reduced-motion respected.
 - Copy says "your sheet", "your words", "make my note". Never "AI", "model", "generate".
 

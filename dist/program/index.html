@@ -5,13 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rounds · Program view</title>
 <meta name="description" content="What's going on across every site, for IHH program staff.">
-<meta name="theme-color" content="#1F6F78">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%231F6F78%22%2F%3E%3Cpath%20d%3D%22M18%2020h20M18%2030h28M18%2040h16%22%20stroke%3D%22%23F3F6F5%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%2040l6%206%2010-12%22%20stroke%3D%22%23F8E16C%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E%0A">
+<meta name="theme-color" content="#0B0D0B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%230B0D0B%22%2F%3E%3Cpath%20d%3D%22M18%2020h20M18%2030h28M18%2040h16%22%20stroke%3D%22%2381E40A%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%2040l6%206%2010-12%22%20stroke%3D%22%2381E40A%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E%0A">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--mist:#F3F6F5;--paper:#fff;--ink:#1C2A2A;--ink-2:#5B6B69;--rule:#DCE4E2;--teal:#1F6F78;--teal-2:#E3F0F1;--on-teal:#fff;--hl:#F8E16C;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--amber-2:#FBF1DC;--sage:#2E7D5B;--sage-2:#E4F2EA;--r:14px;--r-sm:10px}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--mist:#141B1B;--paper:#1C2525;--ink:#EEF3F2;--ink-2:#A6B5B2;--rule:#2B3736;--teal:#5FC4CC;--teal-2:#173536;--on-teal:#0B1A1B;--hl:#E6CF4A;--coral:#FF8F86;--coral-2:#3B1F1D;--amber:#F0B860;--amber-2:#3A2E14;--sage:#7FD6A6;--sage-2:#173328}}
+  :root{--mist:#0B0D0B;--paper:#151815;--ink:#F2F5F0;--ink-2:#A6AEA2;--rule:#2A2F29;--teal:#81E40A;--teal-2:#1A2B0E;--on-teal:#0B0D0B;--hl:#81E40A;--coral:#FF6B5E;--coral-2:#3A1C19;--amber:#F2B84B;--amber-2:#3A2E12;--sage:#D6DBD2;--sage-2:#222722;--r:14px;--r-sm:10px}
   *{box-sizing:border-box} [hidden]{display:none!important}
   body{margin:0;background:var(--mist);color:var(--ink);font:500 16px/1.5 "Nunito",system-ui,sans-serif}
   .wrap{max-width:1120px;margin:0 auto;padding:0 16px 80px}
@@ -32,7 +31,7 @@
   .tile{border-radius:var(--r);padding:12px;border:3px solid var(--rule);background:var(--mist);text-align:left;color:var(--ink);font:inherit;cursor:pointer;display:grid;gap:4px;min-height:0}
   .tile.red{border-color:var(--coral);background:var(--coral-2)} .tile.watch{border-color:var(--amber);background:var(--amber-2)} .tile.steady{border-color:var(--sage);background:var(--sage-2)}
   .tile.red{animation:breathe 2.6s ease-in-out infinite}
-  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(200,70,63,0)}50%{box-shadow:0 0 0 6px rgba(200,70,63,.16)}}
+  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(255,107,94,0)}50%{box-shadow:0 0 0 6px rgba(255,107,94,.22)}}
   @media(prefers-reduced-motion:reduce){.tile.red{animation:none}}
   .tile b{font-size:16px;line-height:1.15}
   .tile .v{font-weight:800;font-size:13px} .red .v{color:var(--coral)} .watch .v{color:var(--amber)} .steady .v{color:var(--sage)}

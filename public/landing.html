@@ -5,13 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rounds</title>
 <meta name="description" content="The shift on one screen for recuperative care nurses. You tap. You sign.">
-<meta name="theme-color" content="#1F6F78">
+<meta name="theme-color" content="#0B0D0B">
 <link rel="icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root{--mist:#F3F6F5;--paper:#fff;--ink:#1C2A2A;--ink-2:#5B6B69;--rule:#DCE4E2;--teal:#1F6F78;--teal-2:#E3F0F1;--on-teal:#fff;--hl:#F8E16C;--hl-ink:#5C4A00;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--sage:#2E7D5B;--sage-2:#E4F2EA;--r:16px}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--mist:#141B1B;--paper:#1C2525;--ink:#EEF3F2;--ink-2:#A6B5B2;--rule:#2B3736;--teal:#5FC4CC;--teal-2:#173536;--on-teal:#0B1A1B;--hl:#E6CF4A;--hl-ink:#1C1700;--coral:#FF8F86;--coral-2:#3B1F1D;--sage:#7FD6A6;--sage-2:#173328}}
+  :root{--mist:#0B0D0B;--paper:#151815;--ink:#F2F5F0;--ink-2:#A6AEA2;--rule:#2A2F29;--teal:#81E40A;--teal-2:#1A2B0E;--on-teal:#0B0D0B;--hl:#81E40A;--hl-ink:#0B0D0B;--coral:#FF6B5E;--coral-2:#3A1C19;--amber:#F2B84B;--sage:#D6DBD2;--sage-2:#222722;--r:16px}
   *{box-sizing:border-box} [hidden]{display:none!important}
   body{margin:0;background:var(--mist);color:var(--ink);font:500 17px/1.55 "Nunito",system-ui,sans-serif}
   .wrap{max-width:1040px;margin:0 auto;padding:0 16px 60px}
@@ -31,14 +30,14 @@
   .door b{font-size:19px;font-weight:900}
   .door span{color:var(--ink-2);font-size:14px}
   .door .go{color:var(--teal);font-weight:800;font-size:15px;margin-top:4px}
-  .mock{background:var(--paper);border-radius:20px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.10)}
+  .mock{background:var(--paper);border-radius:20px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
   .floor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .bed{border-radius:14px 14px 10px 10px;border:3px solid var(--rule);min-height:76px;padding:8px;position:relative;background:var(--mist);font-size:12px;color:var(--ink-2)}
   .bed::before{content:"";position:absolute;left:10px;right:10px;top:6px;height:6px;border-radius:3px;background:var(--rule)}
   .bed b{display:block;margin-top:12px;font-size:15px;color:var(--ink)}
   .bed.due{border-color:var(--teal);background:var(--teal-2);animation:breathe 2.6s ease-in-out infinite}
   .bed.ok{border-color:var(--sage);background:var(--sage-2)} .bed.miss{border-color:var(--coral);background:var(--coral-2)} .bed.open{border-style:dashed;background:transparent}
-  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(31,111,120,0)}50%{box-shadow:0 0 0 6px rgba(31,111,120,.18)}}
+  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(129,228,10,0)}50%{box-shadow:0 0 0 6px rgba(129,228,10,.28)}}
   @media(prefers-reduced-motion:reduce){.bed.due{animation:none}}
   .line{margin-top:10px;background:var(--teal);color:var(--on-teal);border-radius:12px;padding:10px 12px;font-weight:800;font-size:14px}
   .strip{display:grid;gap:12px;margin:34px 0 10px}
@@ -57,7 +56,7 @@
   .trust ul{margin:0;padding:0;display:grid;gap:6px}
   footer{margin-top:40px;font-size:13px;color:var(--ink-2)} footer a{color:var(--teal)}
   /* gate */
-  .gate{position:fixed;inset:0;background:rgba(20,27,27,.45);display:grid;place-items:center;padding:16px;z-index:30}
+  .gate{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;padding:16px;z-index:30}
   .gatebox{background:var(--paper);border-radius:var(--r);padding:22px;max-width:420px;width:100%;display:grid;gap:12px}
   .gatebox h2{margin:0;font-size:22px;font-weight:900}
   .gatebox p{margin:0;color:var(--ink-2);font-size:15px}
@@ -71,7 +70,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header><div class="logo"><svg viewBox="0 0 64 64"><path d="M18 20h20M18 30h28M18 40h16" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M40 40l6 6 10-12" stroke="#F8E16C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><b>Rounds</b><br><span>for recuperative care</span></div></header>
+  <header><div class="logo"><svg viewBox="0 0 64 64"><path d="M18 20h20M18 30h28M18 40h16" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round"/><path d="M40 40l6 6 10-12" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><b>Rounds</b><br><span>for recuperative care</span></div></header>
 
   <section class="hero">
     <div>
