@@ -206,6 +206,22 @@
   .bar{display:inline-flex;gap:2px}
   .bar i{width:10px;height:10px;border-radius:3px;background:var(--sage)} .bar i.m{background:var(--coral)} .bar i.r{background:var(--amber)}
 
+  /* voice */
+  .mic{position:fixed;right:18px;bottom:18px;width:60px;height:60px;border-radius:50%;background:var(--teal);color:var(--on-teal);display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.18);z-index:20;min-height:0}
+  .mic svg{width:28px;height:28px}
+  .mic.on{animation:breathe 1.4s ease-in-out infinite;background:var(--coral)}
+  .voice{position:fixed;left:12px;right:12px;bottom:90px;max-width:520px;margin:0 auto;background:var(--paper);border-radius:var(--r);box-shadow:0 10px 30px rgba(0,0,0,.2);padding:14px;z-index:21;display:grid;gap:10px}
+  .vhd{display:flex;align-items:center;justify-content:space-between} .vhd b{font-size:17px}
+  .vheard{background:var(--mist);border-radius:var(--r-sm);padding:10px 12px;font-size:16px;min-height:44px}
+  .vheard.quote{font-style:italic}
+  .vtype{display:flex;gap:6px} .vtype input{flex:1;height:44px;border:2px solid var(--rule);border-radius:var(--r-sm);padding:0 10px;background:var(--paper);font:inherit}
+  .plan{border:2px solid var(--teal);border-radius:var(--r);padding:12px;display:grid;gap:8px}
+  .plan .what{font-weight:800;font-size:17px}
+  .plan .who{color:var(--ink-2);font-size:14px}
+  .plan.unsure{border-color:var(--amber)}
+  .plan .btns .btn{min-height:48px}
+  button.sm{min-height:36px;padding:0 12px;border-radius:999px;background:var(--mist);font-weight:700;font-size:14px}
+
   /* handoff */
   .ho{margin-top:12px;display:grid;gap:10px}
   .ho .c{border:2px solid var(--rule);border-radius:var(--r);padding:10px 12px}
@@ -377,6 +393,13 @@
 
     <p class="foot">Rounds keeps everything on this device. It never writes to Kipu or to CalOptima. <a href="program.html">Program view for IHH staff</a> · <a href="#" id="resetLink">Start over</a></p>
   </div>
+</div>
+<button class="mic" id="micBtn" aria-label="Tell Rounds what to log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+<div class="voice" id="voice" hidden>
+  <div class="vhd"><b id="vTitle">Listening…</b><button class="sm" id="vClose" aria-label="close">✕</button></div>
+  <div class="vheard" id="vHeard">Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".</div>
+  <div class="vtype"><input type="text" id="vText" placeholder="…or type it here"><button class="sm" id="vGo">Go</button></div>
+  <div id="vPlan"></div>
 </div>
 <div id="printArea" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -623,6 +646,71 @@
     const cl=$('#clearHandoff'); if(cl) cl.onclick=()=>{ try{localStorage.removeItem('rounds.handoff');}catch(e){} renderIncoming(); };
   }
 
+  // ---- voice: hear it, show what was understood, do it on one tap. Deterministic parser; never invents an action.
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, listening=false;
+  const vBox=$('#voice'), vHeard=$('#vHeard'), vPlan=$('#vPlan'), vTitle=$('#vTitle');
+  function words2num(s){ const W={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90,hundred:100}; let r=s.replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)(?:[ -](one|two|three|four|five|six|seven|eight|nine))?\b/gi,(m,a,b)=>{let n=W[a.toLowerCase()]; if(b) n+=W[b.toLowerCase()]; return String(n);}); r=r.replace(/\b(\d) 100 (\d{1,2})\b/g,(m,a,b)=>String(+a*100+ +b)).replace(/\b(\d) 100\b/g,(m,a)=>String(+a*100)).replace(/\b(\d) (\d{2})\b/g,(m,a,b)=>a+b).replace(/\b(\d{2}) (\d)\b(?! over| \/)/g,(m,a,b)=>a+b); return r; }
+  function findClient(t){
+    for(const c of S.clients){ const first=c.display.split(' · ')[0].toLowerCase(); if(new RegExp('\\b'+first+'\\b','i').test(t)) return c; const room=(c.display.match(/Room (\d+)/)||[])[1]; if(room&&new RegExp('\\b(room|bed|rm)\\s*'+room+'\\b','i').test(t)) return c; }
+    return null;
+  }
+  function parse(raw){
+    const t=words2num(String(raw||'').toLowerCase().replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim());
+    const named=findClient(t); const c=named||S.client; const who=c?c.display:null; const cur=latestOpen();
+    let m;
+    if((m=t.match(/(?:blood pressure|bp|pressure)\D*(\d{2,3})\s*(?:over|\/|by|on)?\s*(\d{2,3})/))) return {kind:'line',c,text:`BP ${m[1]}/${m[2]}`,what:`Log blood pressure ${m[1]}/${m[2]}`,vitals:true};
+    if((m=t.match(/(?:blood sugar|sugar|glucose|bs)\D*(\d{2,3})/))) { const ctx=(t.match(/before (breakfast|lunch|dinner)|bedtime|after (breakfast|lunch|dinner)/)||[])[0]||''; return {kind:'line',c,text:`blood sugar ${m[1]}${ctx?' '+ctx:''}`,what:`Log blood sugar ${m[1]}${ctx?' '+ctx:''}`,vitals:true}; }
+    if((m=t.match(/(?:temp|temperature)\D*(\d{2,3}(?:\.\d)?)/))) return {kind:'line',c,text:`temp ${m[1]}`,what:`Log temperature ${m[1]}`,vitals:true};
+    if((m=t.match(/walked?\D*(\d{2,4})\s*(?:feet|ft)?/))) return {kind:'line',c,text:`walked ${m[1]} ft`,what:`Log walked ${m[1]} ft`};
+    if(/\b(took|taken|takes|had)\b.*\b(med|meds|medication|medications|pills?)\b|\bmed pass done\b|\btook it\b/.test(t)) return cur?{kind:'pass',c,status:'took',what:`Log ${cur} med pass: took it, watched`}:{kind:'unsure',what:'No med pass is open right now'};
+    if(/\b(didn'?t come|did not come|missed|no.?show|skipped)\b/.test(t)) return cur?{kind:'pass',c,status:'missed',what:`Log ${cur} med pass: didn't come`}:{kind:'unsure',what:'No med pass is open right now'};
+    if(/\bside effect|dizzy|nause|rash|itch|headache|vomit/.test(t)) return cur?{kind:'pass',c,status:'side',note:t,what:`Log ${cur} med pass: side effect`}:{kind:'unsure',what:'No med pass is open right now'};
+    if(/\b(doctor|dr|physician|md)\b/.test(t)) return {kind:'flag',c,flag:'doctor',what:'Flag: a doctor should look'};
+    if(/\bready\b/.test(t)) return {kind:'flag',c,flag:'ready',what:'Flag: ready to move out soon'};
+    if(/\bvitals?\b.*\b(done|did|taken|checked)\b|\b(did|took|checked)\b.*\bvitals?\b/.test(t)) return {kind:'flag',c,flag:'vitals',what:'Tick vitals done'};
+    if(/\b(open|go to|show|pull up)\b/.test(t)&&named) return {kind:'open',c:named,what:`Open ${named.display}`};
+    if(/\b(hand ?off|handoff)\b/.test(t)) return {kind:'handoff',what:'Prepare the shift handoff'};
+    if(/\b(what'?s missing|still missing|audit)\b/.test(t)) return {kind:'audit',what:"Show what's still missing"};
+    if(/\b(said|says|told me|complains?)\b/.test(t)) { const q=t.replace(/^.*?\b(said|says|told me|complains? (?:of|about))\b\s*/,''); return {kind:'line',c,text:`says ${q}`,what:`Add to sheet: "says ${q}"`}; }
+    if(/\b(taught|showed|told (him|her|them))\b/.test(t)) { const q=t.replace(/^.*?\b(taught|showed|told (?:him|her|them))\b\s*/,''); return {kind:'line',c,text:`taught ${q}`,what:`Add to sheet: "taught ${q}"`}; }
+    if(/\b(note|add|write)\b/.test(t)) { const q=t.replace(/^.*?\b(note|add|write)(?: down| that)?\b\s*/,''); return q?{kind:'line',c,text:q,what:`Add to sheet: "${q}"`}:{kind:'unsure',what:"Didn't catch what to add"}; }
+    return {kind:'unsure',what:"Didn't understand that one",raw:t};
+  }
+  function showPlan(p){
+    const needC=['line','pass','flag'].includes(p.kind)&&!p.c;
+    vPlan.innerHTML=`<div class="plan ${p.kind==='unsure'||needC?'unsure':''}"><div class="what">${esc(p.what)}</div><div class="who">${p.c?'for '+esc(p.c.display):needC?'Who is this for? Say a name or a room, or open a bed first.':''}</div>
+      ${p.kind!=='unsure'&&!needC?`<div class="btns"><button class="btn main" id="vDo">Do it</button><button class="btn" id="vNo">No</button></div>`:`<div class="btns"><button class="btn" id="vAgain">Try again</button></div>`}
+      <div class="muted" style="font-size:12px">Nothing happens until you tap. Rounds only does the actions it understood.</div></div>`;
+    const d=$('#vDo'); if(d) d.onclick=()=>{ act(p); vPlan.innerHTML=''; closeVoice(); };
+    const n=$('#vNo'); if(n) n.onclick=()=>{ vPlan.innerHTML=''; startListen(); };
+    const a=$('#vAgain'); if(a) a.onclick=()=>{ vPlan.innerHTML=''; startListen(); };
+  }
+  function act(p){
+    const iconOf=t=>iconFor(t,'');
+    if(p.kind==='open'){ pick(p.c); toast('Opened '+p.c.display); return; }
+    if(p.kind==='handoff'){ goHome(); $('#prepHandoff').click(); $('#handoffPanel').scrollIntoView({behavior:'smooth'}); return; }
+    if(p.kind==='audit'){ goHome(); showDraft('audit'); $('#draftbox').scrollIntoView({behavior:'smooth'}); return; }
+    if(p.kind==='flag'){ S.flags[p.c.id]=S.flags[p.c.id]||{}; S.flags[p.c.id][p.flag]=true; store.set('flags.'+today,S.flags); if(!S.client) renderHome(); else { if(S.client.id!==p.c.id){} } toast(p.what+' · '+p.c.display.split(' · ')[0]); if($('#home').hidden===false) renderHome(); return; }
+    if(p.kind==='pass'){ const cur=latestOpen(); S.log[p.c.id]=S.log[p.c.id]||{}; S.log[p.c.id][cur]=p.status; if(p.note) S.log[p.c.id][cur+':note']=p.note; store.set('log.'+today,S.log); toast(`${p.c.display.split(' · ')[0]}: ${cur} pass logged`); if($('#home').hidden===false) renderHome(); return; }
+    if(p.kind==='line'){ if(!S.client||S.client.id!==p.c.id) pick(p.c); S.lines.push({t:p.text,icon:iconOf(p.text)}); renderLines(); if(p.vitals){ S.flags[p.c.id]=S.flags[p.c.id]||{}; S.flags[p.c.id].vitals=true; store.set('flags.'+today,S.flags); } toast('Added to '+p.c.display.split(' · ')[0]+"'s sheet"); return; }
+  }
+  function startListen(){
+    if(!SR){ vTitle.textContent='Type what you\'d say'; vHeard.textContent='This browser has no speech recognition. Typing works the same way.'; $('#vText').focus(); return; }
+    try{ rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=1;
+      rec.onstart=()=>{ listening=true; $('#micBtn').classList.add('on'); vTitle.textContent='Listening…'; };
+      rec.onresult=e=>{ let t=''; for(const r of e.results) t+=r[0].transcript; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); if(e.results[e.results.length-1].isFinal){ showPlan(parse(t)); } };
+      rec.onerror=e=>{ vTitle.textContent='Couldn\'t hear'; vHeard.textContent=(e.error==='not-allowed'?'Microphone is blocked for this page. Typing works the same way.':'Try again, or type it.'); stopListen(); };
+      rec.onend=()=>stopListen();
+      rec.start();
+    }catch(e){ vTitle.textContent='Type what you\'d say'; }
+  }
+  function stopListen(){ listening=false; $('#micBtn').classList.remove('on'); }
+  function closeVoice(){ vBox.hidden=true; if(rec){ try{rec.stop();}catch(e){} } stopListen(); }
+  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } vBox.hidden=false; vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".'; $('#vText').value=''; startListen(); };
+  $('#vClose').onclick=closeVoice;
+  const typed=()=>{ const t=$('#vText').value.trim(); if(!t) return; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); showPlan(parse(t)); };
+  $('#vGo').onclick=typed; $('#vText').addEventListener('keydown',e=>{ if(e.key==='Enter') typed(); });
+
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
   $('#teamBtn').onclick=()=>showDraft('team'); $('#auditBtn').onclick=()=>showDraft('audit');
   $('#resetLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');localStorage.removeItem('rounds.done');}catch(_){} location.reload();};
@@ -637,7 +725,7 @@
     const dots=$('#dots'); dots.innerHTML=S.clients.map(c=>`<i class="${S.done[c.id]?'on':''}"></i>`).join('');
     const n=Object.keys(S.done).filter(k=>S.done[k]).length; $('#sub').textContent = n? `${n} of ${S.clients.length} noted at the time today.` : 'Here is your floor. Tap a bed to work it.';
   }
-  function pick(c){ S.client=c; S.lines=[]; S.draft=null; S.dec={}; S.open=null; $('#home').hidden=true; $('#cols').hidden=false; $('#board').hidden=false; renderBoard(); renderWho(); renderTiles(); renderLines(); renderDraft(); window.scrollTo({top:0}); }
+  function pick(c){ S.client=c; S.lines=(store.get('lines.'+today,{})[c.id])||[]; S.draft=null; S.dec={}; S.open=null; $('#home').hidden=true; $('#cols').hidden=false; $('#board').hidden=false; renderBoard(); renderWho(); renderTiles(); renderLines(); renderDraft(); window.scrollTo({top:0}); }
   function renderWho(){ const [name]=S.client.display.split(' · '); $('#whoName').textContent=S.client.display; $('#whoSum').textContent=S.client.summary;
     $('#goalrow').innerHTML=S.client.goals.map(g=>`<span class="goal" title="${esc(g.text)}">${svg(iconFor(g.text,''))}<span>${esc(g.id)} · ${esc(g.text.length>34?g.text.slice(0,34)+'…':g.text)}</span></span>`).join(''); }
   function renderTiles(){ $('#tiles').innerHTML=TILES.map(t=>`<button class="tile" data-tile="${t.id}" aria-expanded="${S.open===t.id}">${svg(t.icon)}<span>${esc(t.label)}</span></button>`).join('');
@@ -654,6 +742,7 @@
   }
   $('#free').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); const v=e.target.value.trim(); if(v){ S.lines.push({t:v,icon:iconFor(v,'')}); e.target.value=''; renderLines(); } } });
   function renderLines(){
+    if(S.client){ const all=store.get('lines.'+today,{}); all[S.client.id]=S.lines; store.set('lines.'+today,all); }
     $('#lines').innerHTML=S.lines.length ? S.lines.map((l,i)=>`<li data-line="${i}">${svg(l.icon)}<span>${esc(l.t)}</span><button data-del="${i}" aria-label="remove line">remove</button></li>`).join('')
       : `<li style="grid-template-columns:1fr;color:var(--ink-2)"><span>Nothing on the sheet yet. Tap a tile above${S.client&&S.client.sample_jottings?', or <button id="loadSample" style="min-height:0;padding:0;color:var(--teal);font-weight:800;text-decoration:underline">load a sample sheet</button>':''}.</span></li>`;
     const ls=$('#loadSample'); if(ls) ls.onclick=()=>{S.lines=S.client.sample_jottings.split('\n').map(t=>({t,icon:iconFor(t,'')}));renderLines();};

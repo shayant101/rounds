@@ -27,7 +27,20 @@
   .kpi b{display:block;font-size:28px;line-height:1.1}
   .kpi span{font-size:12px;color:var(--ink-2)}
   .kpi.bad b{color:var(--coral)} .kpi.warn b{color:var(--amber)} .kpi.good b{color:var(--sage)}
-  .flags{margin-top:12px;display:grid;gap:6px}
+  .sitemap{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  @media(min-width:700px){.sitemap{grid-template-columns:repeat(4,1fr)}}
+  .tile{border-radius:var(--r);padding:12px;border:3px solid var(--rule);background:var(--mist);text-align:left;color:var(--ink);font:inherit;cursor:pointer;display:grid;gap:4px;min-height:0}
+  .tile.red{border-color:var(--coral);background:var(--coral-2)} .tile.watch{border-color:var(--amber);background:var(--amber-2)} .tile.steady{border-color:var(--sage);background:var(--sage-2)}
+  .tile.red{animation:breathe 2.6s ease-in-out infinite}
+  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(200,70,63,0)}50%{box-shadow:0 0 0 6px rgba(200,70,63,.16)}}
+  @media(prefers-reduced-motion:reduce){.tile.red{animation:none}}
+  .tile b{font-size:16px;line-height:1.15}
+  .tile .v{font-weight:800;font-size:13px} .red .v{color:var(--coral)} .watch .v{color:var(--amber)} .steady .v{color:var(--sage)}
+  .tile .nums{display:flex;gap:8px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
+  .tile .nums b{font-size:14px;color:var(--ink)}
+  .tile .why{margin:2px 0 0;padding:0;list-style:none;font-size:12px;color:var(--ink-2)}
+  .all{margin-top:12px} .all summary{cursor:pointer;font-weight:800;color:var(--teal)}
+  .flags{margin-top:8px;display:grid;gap:6px}
   .flag{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:var(--r-sm);background:var(--coral-2)}
   .flag.warn{background:var(--amber-2)}
   .flag i{width:12px;height:12px;border-radius:50%;background:var(--coral);margin-top:6px;display:block}
@@ -70,7 +83,8 @@
   <div class="program">
     <h2>Across the program</h2>
     <div class="kpis" id="pk"></div>
-    <div class="flags" id="pflags"></div>
+    <div class="sitemap" id="sitemap"></div>
+    <details class="all"><summary id="flagSummary">All flags</summary><div class="flags" id="pflags"></div></details>
   </div>
 
   <div class="sites" id="sites"></div>
@@ -123,14 +137,17 @@
   const tot={census:sites.reduce((a,s)=>a+s.census,0),beds:sites.reduce((a,s)=>a+s.beds,0),missed:sites.reduce((a,s)=>a+s.hist.missed.at(-1),0),red:sites.filter(s=>s.v.level==='red').length,doctor:sites.reduce((a,s)=>a+s.doctor,0),ready:sites.reduce((a,s)=>a+s.ready,0),reauth:sites.reduce((a,s)=>a+s.reauth,0)};
   $('#asof').textContent=`${sites.length} sites · ${new Date().toLocaleDateString([], {weekday:'long',month:'short',day:'numeric'})} · red flags first.`;
   $('#pk').innerHTML=`<div class="kpi ${tot.red?'bad':'good'}"><b>${tot.red}</b><span>site${tot.red===1?'':'s'} with a red flag</span></div><div class="kpi ${tot.missed>=3?'bad':tot.missed?'warn':'good'}"><b>${tot.missed}</b><span>doses missed vs. orders today</span></div><div class="kpi ${tot.doctor?'warn':'good'}"><b>${tot.doctor}</b><span>flagged for a doctor</span></div><div class="kpi"><b>${tot.ready}</b><span>ready to move out</span></div><div class="kpi"><b>${tot.census}<span style="font-size:14px;color:var(--ink-2)">/${tot.beds}</span></b><span>beds in use</span></div>`;
+  const ordr={red:0,watch:1,steady:2};
+  $('#sitemap').innerHTML=[...sites].sort((a,b)=>ordr[a.v.level]-ordr[b.v.level]).map((s,i)=>`<button class="tile ${s.v.level}" data-go="${esc(s.name)}"><b>${esc(s.name)}</b><span class="v">${s.v.label}${s.live?' · live':''}</span><span class="nums"><span><b>${s.census}</b>/${s.beds}</span><span><b>${s.hist.completion.at(-1)}%</b> passes</span><span><b>${s.hist.missed.at(-1)}</b> missed</span></span>${s.v.why.length?`<ul class="why">${s.v.why.slice(0,2).map(w=>`<li>${esc(w.t)}</li>`).join('')}${s.v.why.length>2?`<li>+${s.v.why.length-2} more</li>`:''}</ul>`:''}</button>`).join('');
   const allFlags=sites.flatMap(s=>s.v.why.map(w=>({site:s.name,...w}))).sort((a,b)=>(a.l==='bad'?0:1)-(b.l==='bad'?0:1));
+  $('#flagSummary').textContent=`All flags (${allFlags.length})`;
   $('#pflags').innerHTML=allFlags.length?allFlags.map(f=>`<div class="flag ${f.l==='bad'?'':'warn'}"><i></i><div><b>${esc(f.t)}</b><span>${esc(f.site)}</span></div></div>`).join(''):`<div class="flag" style="background:var(--sage-2)"><i style="background:var(--sage)"></i><div><b>Nothing flagged across the program.</b></div></div>`;
 
   const order={red:0,watch:1,steady:2};
   $('#sites').innerHTML=sites.sort((a,b)=>order[a.v.level]-order[b.v.level]).map(s=>{
     const c=s.hist.completion.at(-1), m=s.hist.missed.at(-1);
     const bars=(arr,bad,warn,invert)=>arr.map((v,i)=>{const lvl=invert?(v<bad?'bad':v<warn?'warn':'ok'):(v>=bad?'bad':v>=warn?'warn':'ok'); const max=Math.max(...arr,1); const hgt=invert?Math.max(8,Math.round(100*(v-Math.min(...arr)+5)/(max-Math.min(...arr)+5))):Math.max(8,Math.round(100*v/max)); return `<i class="${lvl} ${i===arr.length-1?'today':''}" style="height:${v===0&&!invert?8:hgt}%" title="${v}"></i>`;}).join('');
-    return `<div class="site ${s.v.level}"><div class="hd"><h3>${esc(s.name)}</h3>${s.live?'<span class="live">live from this device</span>':''}<span class="verdict">${s.v.label}</span></div>
+    return `<div class="site ${s.v.level}" data-site="${esc(s.name)}"><div class="hd"><h3>${esc(s.name)}</h3>${s.live?'<span class="live">live from this device</span>':''}<span class="verdict">${s.v.label}</span></div>
       <div class="sub">${s.census} of ${s.beds} beds · ${esc(s.staff)}${s.live&&s.openPasses!=null?` · ${s.logged}/${s.openPasses} passes logged so far`:''}</div>
       <div class="grid"><div class="m ${c<85?'bad':c<95?'warn':'good'}"><b>${c}%</b><span>med pass done</span></div><div class="m ${m>=3?'bad':m?'warn':'good'}"><b>${m}</b><span>missed vs. orders</span></div><div class="m ${s.doctor?'warn':''}"><b>${s.doctor}</b><span>doctor flags</span></div><div class="m"><b>${s.ready}</b><span>ready soon</span></div>
         <div class="m ${s.side?'warn':''}"><b>${s.side}</b><span>side effects</span></div><div class="m ${s.notes<80?'warn':''}"><b>${s.notes}%</b><span>notes done</span></div><div class="m ${s.handoff?'good':'bad'}"><b>${s.handoff?'✓':'—'}</b><span>handoff</span></div><div class="m ${s.reauth>=5?'warn':''}"><b>${s.reauth}</b><span>reauths due</span></div></div>
@@ -138,6 +155,7 @@
       <div class="trend"><div class="lbl">Med pass completion, last 7 days</div><div class="bars">${bars(s.hist.completion,85,95,true)}</div></div>
       ${s.v.why.length?`<ul class="why">${s.v.why.map(w=>`<li class="${w.l}">${esc(w.t)}</li>`).join('')}</ul>`:'<p class="why" style="list-style:none;padding:0">Nothing to chase here today.</p>'}
     </div>`; }).join('');
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{ const el=document.querySelector(`[data-site="${CSS.escape(b.dataset.go)}"]`); if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); el.style.outline='3px solid var(--hl)'; setTimeout(()=>el.style.outline='',1500);} });
 })();
 </script>
 </body>
