@@ -397,7 +397,7 @@
       </section>
     </div>
 
-    <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="switchLink">Switch person</a> · <a href="#" id="resetLink">Start over</a></p>
+    <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="switchLink">Switch person</a> · <a href="#" id="resetLink">Reset demo</a></p>
   </div>
 </div>
 <button class="mic" id="micBtn" aria-label="Tell Rounds what to log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
@@ -414,6 +414,7 @@
 <script src="medrec.js"></script>
 <script>
 (function(){
+  if(location.search.indexOf('reset')>=0){ try{ Object.keys(localStorage).filter(k=>k.startsWith('rounds.')&&k!=='rounds.theme').forEach(k=>localStorage.removeItem(k)); }catch(_){} history.replaceState(null,'',location.pathname); }
   const $=s=>document.querySelector(s); const V=window.RoundsVerify;
   const store={get(k,d){try{const v=localStorage.getItem('rounds.'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('rounds.'+k,JSON.stringify(v))}catch(e){}}};
   const S={profile:store.get('profile',null),clients:[],client:null,lines:[],draft:null,check:null,dec:{},lang:'en',done:store.get('done',{}),open:null,ctx:null,active:null};
@@ -649,7 +650,7 @@
     const groups={}; items.forEach(i=>(groups[i.c]=groups[i.c]||[]).push(i));
     box.innerHTML=`<div class="incoming"><h2>Handoff from ${esc(h.from)}, ${esc(h.shift)} · ${new Date(h.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}</h2>
       ${Object.entries(groups).map(([c,arr])=>`<div class="c"><b>${esc(c)}</b>${arr.map(i=>`<label class="${ack[i.k]?'done':''}"><input type="checkbox" data-ack="${esc(i.k)}" ${ack[i.k]?'checked':''}><span>${esc(i.a)}</span></label>`).join('')}</div>`).join('')}
-      <div class="btns"><span class="muted" style="align-self:center">${left?left+' to go':'All read.'}</span>${left?'':'<button class="btn" id="clearHandoff">Clear</button>'}</div></div>`;
+      <div class="btns"><span class="muted" style="align-self:center">${left?left+' to go':'All read.'}</span><button class="btn" id="clearHandoff">${left?'Dismiss':'Clear'}</button></div></div>`;
     box.querySelectorAll('[data-ack]').forEach(cb=>cb.onchange=()=>{ h.ack=h.ack||{}; h.ack[cb.dataset.ack]=cb.checked; store.set('handoff',h); renderIncoming(); });
     const cl=$('#clearHandoff'); if(cl) cl.onclick=()=>{ try{localStorage.removeItem('rounds.handoff');}catch(e){} renderIncoming(); };
   }
@@ -722,7 +723,9 @@
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
   $('#teamBtn').onclick=()=>showDraft('team'); $('#auditBtn').onclick=()=>showDraft('audit');
   $('#switchLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');}catch(_){} location.reload();};
-  $('#resetLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');localStorage.removeItem('rounds.done');}catch(_){} location.reload();};
+  function wipeAll(){ try{ Object.keys(localStorage).filter(k=>k.startsWith('rounds.')&&k!=='rounds.theme').forEach(k=>localStorage.removeItem(k)); }catch(_){} }
+  $('#resetLink').onclick=e=>{e.preventDefault(); wipeAll(); location.href=location.pathname;};
+  if(location.search.indexOf('reset')>=0){ wipeAll(); history.replaceState(null,'',location.pathname); }
 
   function renderBoard(){
     const b=$('#board'); b.innerHTML='';
