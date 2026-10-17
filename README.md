@@ -22,6 +22,10 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 
 ![The floor](docs/screenshot-floor.png)
 
+- **Med rec: ordered vs. taken.** Kipu can export two lists: what the doctor ordered and what was actually taken. Today nobody compares them, and a missed dose surfaces when a payer audits. Drop both CSVs in (or use the samples); Rounds matches by client ID and medication, reads expected doses off the frequency (BID = 2, QID = 4, PRN = as needed, "per INR schedule" = can't tell), and shows missed doses, refused doses, meds taken with no order, and orders it couldn't read. Column names are guessed from the headers and can be corrected. Beds with a gap turn coral on the floor. "Copy the discrepancy list" gives the follow-up list. Nothing is uploaded; the files never leave the browser.
+
+![Med rec](docs/screenshot-medrec.png)
+
 - **One line that matters now:** "2 clients haven't come for the 12pm pass yet: Robert, Dolores."
 - **Med pass board:** rooms by pass times. Tap a cell: *Took it, I watched* / *Didn't come* / *Side effect*. That tap is the med log.
 - **Go find:** who to chase for the open pass, and who missed earlier.
@@ -99,11 +103,13 @@ Run the checks on all samples: `npm run eval` (writes `eval/results.md`).
 | Clients and care plan goals | made up; three samples |
 | Kipu integration | none, by design. Output is text you paste. Rounds never reads or writes IHH systems |
 | Med pass log, due-today ticks, flags, name | stored in the browser only, per day |
-| Pass times, med names, appointments | made up for the three sample clients |
+| Pass times, med names, appointments, MRNs | made up for the three sample clients |
+| Med rec matcher | working on CSV; the two sample exports are made up because IHH could not pull up Kipu's real export format today. The column guesser is built to absorb header differences; real files may still need the manual mapping |
 | Tile composing, highlighter, CalOptima box mapping | working; the mapping is our reading of CalOptima's Appendix I, not confirmed with CalOptima or IHH |
 
 ## Where it gets things wrong
 
+- Med rec matches on client ID + first word of the medication name. Brand vs. generic names (Tylenol vs. acetaminophen) will not match until a synonym list is added. Weekly and INR-driven orders are reported as "can't tell", not guessed.
 - The checker only knows what you typed. If you jot "BS 142" and meant 124, the note says 142 and nothing catches it.
 - The scope-word list is short and English-only. A model can interpret without using any of those words.
 - Spanish teach-sheet lines are not verified against the English ones beyond numbers.

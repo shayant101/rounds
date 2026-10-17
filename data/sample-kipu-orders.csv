@@ -1,0 +1,9 @@
+MRN,Client,Medication,Dose,Frequency,Route,Prescriber
+R-0004,Robert,Metformin,500 mg,BID,PO,Dr. [redacted]
+R-0004,Robert,Lisinopril,10 mg,Daily,PO,Dr. [redacted]
+R-0007,Dolores,Lisinopril,20 mg,Daily,PO,Dr. [redacted]
+R-0007,Dolores,Amlodipine,5 mg,Daily,PO,Dr. [redacted]
+R-0002,Marcus,Cephalexin,500 mg,QID,PO,Dr. [redacted]
+R-0002,Marcus,Acetaminophen,500 mg,PRN,PO,Dr. [redacted]
+R-0009,Client 9,Atorvastatin,40 mg,every evening,PO,Dr. [redacted]
+R-0009,Client 9,Warfarin,5 mg,per INR schedule,PO,Dr. [redacted]

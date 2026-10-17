@@ -1,0 +1,12 @@
+MRN,Client,Medication,Dose,Administered Date,Administered Time,Status,Staff
+R-0004,Robert,Metformin,500 mg,2026-10-17,08:05,Self-administered,LVN [redacted]
+R-0004,Robert,Lisinopril,10 mg,2026-10-17,08:05,Self-administered,LVN [redacted]
+R-0007,Dolores,Lisinopril,20 mg,2026-10-17,08:20,Self-administered,LVN [redacted]
+R-0002,Marcus,Cephalexin,500 mg,2026-10-17,08:00,Self-administered,LVN [redacted]
+R-0002,Marcus,Cephalexin,500 mg,2026-10-17,12:10,Self-administered,LVN [redacted]
+R-0002,Marcus,Cephalexin,500 mg,2026-10-17,17:05,Refused,LVN [redacted]
+R-0002,Marcus,Ibuprofen,200 mg,2026-10-17,13:00,Self-administered,LVN [redacted]
+R-0009,Client 9,Atorvastatin,40 mg,2026-10-17,20:30,Self-administered,LVN [redacted]
+R-0009,Client 9,Warfarin,5 mg,2026-10-17,20:30,Self-administered,LVN [redacted]
+R-0004,Robert,Metformin,500 mg,2026-10-16,08:00,Self-administered,LVN [redacted]
+R-0004,Robert,Metformin,500 mg,2026-10-16,17:30,Self-administered,LVN [redacted]

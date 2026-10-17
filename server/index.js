@@ -15,6 +15,7 @@ const mocks = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'moc
 const app = express();
 app.use(express.json({ limit: '64kb' }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use('/data', express.static(path.join(__dirname, '..', 'data'), { index: false }));
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, mode: API_KEY ? 'live' : 'mock', models: API_KEY ? MODELS : [] });

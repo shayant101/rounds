@@ -177,11 +177,40 @@
   .legend .k.due{border-color:var(--teal);background:var(--teal-2)} .legend .k.ok{border-color:var(--sage);background:var(--sage-2)} .legend .k.miss{border-color:var(--coral);background:var(--coral-2)} .legend .k.flag{background:var(--amber);border-color:var(--amber)} .legend .k.open{border-style:dashed}
   @media(min-width:980px){.floor .side{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
+  /* med rec */
+  .drops{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .drop{display:block;border:2px dashed var(--rule);border-radius:var(--r);padding:12px;cursor:pointer;font-size:14px;line-height:1.3;min-height:64px}
+  .drop.has{border-style:solid;border-color:var(--teal);background:var(--teal-2)}
+  .drop input{display:none}
+  .recopts{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14px}
+  .recopts select{height:40px;border:2px solid var(--rule);border-radius:var(--r-sm);background:var(--paper);color:var(--ink);font:inherit;padding:0 8px}
+  .recopts details{width:100%} .recopts summary{cursor:pointer;color:var(--teal);font-weight:700}
+  .mapgrid{display:grid;grid-template-columns:auto 1fr 1fr;gap:6px 10px;align-items:center;margin-top:8px;font-size:13px}
+  .mapgrid .h{font-weight:800;color:var(--ink-2)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+  .kpi{background:var(--mist);border-radius:var(--r-sm);padding:10px 8px;text-align:center}
+  .kpi b{display:block;font-size:26px;line-height:1.1}
+  .kpi.bad b{color:var(--coral)} .kpi.warn b{color:var(--amber)} .kpi.good b{color:var(--sage)}
+  .kpi span{font-size:12px;color:var(--ink-2)}
+  .recc{margin-top:10px;border:2px solid var(--rule);border-radius:var(--r);padding:10px 12px}
+  .recc.gap{border-color:var(--coral)}
+  .recc .t{display:flex;align-items:center;gap:8px;font-weight:800}
+  .recc .t .muted{font-weight:500;margin-left:auto}
+  .recc ul{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:4px}
+  .recc li{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:15px;padding:6px 8px;border-radius:8px;background:var(--mist)}
+  .recc li.none{background:var(--coral-2);color:var(--coral);font-weight:700}
+  .recc li.partial{background:var(--amber-2);color:var(--amber);font-weight:700}
+  .recc li.extra{background:var(--amber-2);color:var(--amber)}
+  .recc li.unknown{background:var(--mist);color:var(--ink-2)}
+  .recc li.ok{color:var(--sage)}
+  .bar{display:inline-flex;gap:2px}
+  .bar i{width:10px;height:10px;border-radius:3px;background:var(--sage)} .bar i.m{background:var(--coral)} .bar i.r{background:var(--amber)}
+
   /* my shift */
   .home{display:grid;gap:14px;min-width:0} .home>*{min-width:0}
   .panel{background:var(--paper);border-radius:var(--r);padding:16px}
   .ph{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
-  .ph h2{margin:0;font-size:20px;font-weight:800}
+  .ph h2{margin:0;font-size:20px;font-weight:800;white-space:nowrap}
   .muted{color:var(--ink-2);font-size:14px}
   .insight{background:var(--teal);color:var(--on-teal);border-radius:var(--r);padding:16px 18px;font-size:19px;font-weight:700;line-height:1.35}
   .insight.calm{background:var(--sage-2);color:var(--ink)}
@@ -279,6 +308,17 @@
         <div class="passgrid" id="passgrid"></div>
         <div id="passPick"></div>
         <div class="gofind" id="gofind"></div>
+      </div>
+      <div class="panel" id="medrecPanel">
+        <div class="ph"><h2>Med rec</h2><span class="muted">ordered vs. taken, from Kipu's two exports</span></div>
+        <p class="muted" style="margin:0 0 10px;font-size:14px">Kipu can export what the doctor ordered and what was actually taken. Nobody has time to compare them by hand. Drop both here; nothing leaves this device.</p>
+        <div class="drops">
+          <label class="drop"><span><b>Ordered</b><br><span class="muted" id="ordName">doctor's orders export (.csv)</span></span><input type="file" accept=".csv,text/csv" id="ordFile"></label>
+          <label class="drop"><span><b>Taken</b><br><span class="muted" id="marName">administration / MAR export (.csv)</span></span><input type="file" accept=".csv,text/csv" id="marFile"></label>
+        </div>
+        <div class="btns" style="margin-top:8px"><button class="btn" id="sampleRec">Use sample exports</button><button class="btn main" id="runRec" disabled>Compare</button></div>
+        <div id="recOpts"></div>
+        <div id="recOut"></div>
       </div>
       <div class="panel">
         <div class="ph"><h2>Due today</h2><span class="muted">tap to tick off</span></div>
@@ -424,6 +464,125 @@
 
   return { checkSentence, checkDraft, stripIdentifiers, numbersIn, SCOPE_WORDS, DEFAULT_PHRASES };
 });
+</script><script>// Med rec: compare what was ordered with what was taken. Pure functions, no network.
+// Input: two CSV texts (Kipu "orders" export and Kipu "administrations/MAR" export).
+// Column names are guessed from headers and can be overridden. Everything runs in the browser.
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.MedRec = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+
+  function parseCSV(text) {
+    const rows = []; let row = [], cell = '', q = false;
+    const s = String(text || '').replace(/\r\n?/g, '\n');
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (q) { if (ch === '"') { if (s[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === ',') { row.push(cell); cell = ''; }
+      else if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += ch;
+    }
+    if (cell.length || row.length) { row.push(cell); rows.push(row); }
+    const hdr = (rows.shift() || []).map(h => h.trim());
+    return { headers: hdr, rows: rows.filter(r => r.some(c => String(c).trim() !== '')).map(r => Object.fromEntries(hdr.map((h, i) => [h, (r[i] || '').trim()]))) };
+  }
+
+  // Guess which header plays which role. Returns {client, med, dose, freq, date, time, status}
+  const GUESS = {
+    client: [/^mrn$/i, /client.?id/i, /patient.?id/i, /^id$/i, /chart/i, /medical record/i, /mrn/i, /client/i, /patient/i],
+    med: [/^medication$/i, /^med(ication)?[ _]?name$/i, /^drug$/i, /order(ed)?[ _]?med/i, /medication/i, /^med$/i, /drug/i],
+    dose: [/^dose$/i, /dosage/i, /strength/i, /dose/i],
+    freq: [/frequency/i, /^freq$/i, /^sig$/i, /schedule/i, /directions/i, /how often/i],
+    date: [/^date$/i, /admin.*date/i, /given.*date/i, /date.*admin/i, /date/i],
+    time: [/^time$/i, /admin.*time/i, /time.*admin/i, /scheduled.*time/i, /time/i],
+    status: [/^status$/i, /result/i, /action/i, /outcome/i, /taken/i, /given/i]
+  };
+  function guessColumns(headers) {
+    const out = {};
+    Object.entries(GUESS).forEach(([role, pats]) => {
+      for (const p of pats) { const h = headers.find(h => p.test(h) && !Object.values(out).includes(h)); if (h) { out[role] = h; break; } }
+    });
+    return out;
+  }
+
+  // "BID" -> 2 doses/day. PRN -> 0 (not counted). Unknown -> null (shown as "can't tell").
+  function dosesPerDay(freq, timesField) {
+    const f = String(freq || '').toLowerCase().trim();
+    if (!f && timesField) return String(timesField).split(/[,;/ ]+/).filter(Boolean).length || null;
+    if (/prn|as needed/.test(f)) return 0;
+    const m = f.match(/(\d+)\s*(?:x|times)\s*(?:a|per|\/)?\s*day/); if (m) return +m[1];
+    const q = f.match(/q\s*(\d+)\s*h/); if (q) return Math.max(1, Math.round(24 / +q[1]));
+    if (/\bqid\b|four times/.test(f)) return 4;
+    if (/\btid\b|three times/.test(f)) return 3;
+    if (/\bbid\b|twice|two times/.test(f)) return 2;
+    if (/\bqd\b|daily|once|every day|every night|nightly|bedtime|\bhs\b|\bqhs\b|every morning|every evening|at night|qam|qpm/.test(f)) return 1;
+    if (/weekly|q\s*week/.test(f)) return null; // weekly orders need a date range; out of scope for a one-day compare
+    return null;
+  }
+
+  function normMed(s) {
+    return String(s || '').toLowerCase().replace(/\d+(\.\d+)?\s*(mg|mcg|g|ml|units?|%)/g, ' ').replace(/[^a-z ]/g, ' ').trim().split(/\s+/)[0] || '';
+  }
+  const TAKEN = /^(given|taken|administered|self[- ]?administered|yes|y|done|complete[d]?|true|1)$/i;
+  const NOT_TAKEN = /^(refused|missed|held|not given|no|n|omitted|declined|false|0)$/i;
+
+  // Compare for one date. orders/mar are {headers, rows}; map = {orders:{client,med,dose,freq,time}, mar:{client,med,date,time,status}}
+  function compare(orders, mar, map, date) {
+    const oc = map.orders, mc = map.mar;
+    const marRows = mar.rows.filter(r => !mc.date || !date || String(r[mc.date]).slice(0, 10) === date || sameDay(r[mc.date], date));
+    const byClient = {};
+    const unmatchedMar = [];
+
+    // index MAR rows by client+med
+    const marIdx = {};
+    marRows.forEach(r => {
+      const k = key(r[mc.client], r[mc.med]);
+      (marIdx[k] = marIdx[k] || []).push(r);
+    });
+
+    orders.rows.forEach(o => {
+      const client = o[oc.client] || '(no id)';
+      const med = o[oc.med] || '(no medication)';
+      const expected = dosesPerDay(o[oc.freq], oc.time ? o[oc.time] : null);
+      const k = key(client, med);
+      const hits = marIdx[k] || []; marIdx[k] = hits.concat([{ __used: true }]);
+      const taken = hits.filter(r => !mc.status || !r[mc.status] || TAKEN.test(r[mc.status])).length;
+      const refused = hits.filter(r => mc.status && NOT_TAKEN.test(r[mc.status] || '')).length;
+      const item = { client, med, dose: oc.dose ? o[oc.dose] : '', freq: oc.freq ? o[oc.freq] : '', expected, taken, refused,
+        missed: expected == null ? null : Math.max(0, expected - taken),
+        status: expected == null ? 'unknown' : expected === 0 ? 'prn' : taken >= expected ? 'ok' : taken === 0 ? 'none' : 'partial' };
+      (byClient[client] = byClient[client] || { client, items: [], missed: 0, unknown: 0, extra: [] }).items.push(item);
+      if (item.missed) byClient[client].missed += item.missed;
+      if (item.status === 'unknown') byClient[client].unknown++;
+    });
+    // MAR rows with no order
+    Object.entries(marIdx).forEach(([k, rows]) => {
+      if (rows.some(r => r.__used)) return;
+      rows.forEach(r => { const client = r[mc.client] || '(no id)'; (byClient[client] = byClient[client] || { client, items: [], missed: 0, unknown: 0, extra: [] }).extra.push({ med: r[mc.med], time: mc.time ? r[mc.time] : '', status: mc.status ? r[mc.status] : '' }); unmatchedMar.push(r); });
+    });
+    const clients = Object.values(byClient).sort((a, b) => (b.missed - a.missed) || (b.extra.length - a.extra.length));
+    const totals = { clients: clients.length, withGaps: clients.filter(c => c.missed > 0).length, missedDoses: clients.reduce((s, c) => s + c.missed, 0), extras: unmatchedMar.length, unknown: clients.reduce((s, c) => s + c.unknown, 0) };
+    return { date, clients, totals };
+  }
+  function key(c, m) { return String(c || '').trim().toLowerCase() + '|' + normMed(m); }
+  function sameDay(a, b) { const da = new Date(a), db = new Date(b); return !isNaN(da) && !isNaN(db) && da.toDateString() === db.toDateString(); }
+  function datesIn(mar, col) { if (!col) return []; const set = new Set(mar.rows.map(r => { const d = new Date(r[col]); return isNaN(d) ? String(r[col]).slice(0, 10) : d.toISOString().slice(0, 10); }).filter(Boolean)); return [...set].sort(); }
+
+  function discrepancyText(result, nameFor) {
+    const lines = [`Med rec for ${result.date || 'the export'}: ${result.totals.missedDoses} missed dose${result.totals.missedDoses === 1 ? '' : 's'} across ${result.totals.withGaps} client${result.totals.withGaps === 1 ? '' : 's'}; ${result.totals.extras} given without a matching order; ${result.totals.unknown} order${result.totals.unknown === 1 ? '' : 's'} where the frequency couldn't be read.`, ''];
+    result.clients.forEach(c => {
+      const gaps = c.items.filter(i => i.missed || i.status === 'unknown');
+      if (!gaps.length && !c.extra.length) return;
+      lines.push(`${nameFor ? nameFor(c.client) : c.client}`);
+      gaps.forEach(i => lines.push(`  - ${i.med}${i.dose ? ' ' + i.dose : ''} ${i.freq ? '(' + i.freq + ')' : ''}: ${i.status === 'unknown' ? "can't tell expected doses from the frequency" : `taken ${i.taken} of ${i.expected}${i.refused ? ', ' + i.refused + ' recorded as refused/held' : ''}`}`));
+      c.extra.forEach(e => lines.push(`  - ${e.med}: recorded as taken${e.time ? ' at ' + e.time : ''} but no matching order`));
+    });
+    return lines.join('\n');
+  }
+
+  return { parseCSV, guessColumns, dosesPerDay, normMed, compare, datesIn, discrepancyText };
+});
 </script><script>
 (function(){
   const CLIENTS={
@@ -471,7 +630,8 @@
           "when": "Fri",
           "what": "wound clinic"
         }
-      ]
+      ],
+      "mrn": "R-0004"
     },
     {
       "id": "dolores",
@@ -514,7 +674,8 @@
           "when": "Thu",
           "what": "primary care"
         }
-      ]
+      ],
+      "mrn": "R-0007"
     },
     {
       "id": "marcus",
@@ -554,7 +715,8 @@
           "when": "Mon",
           "what": "wound check"
         }
-      ]
+      ],
+      "mrn": "R-0002"
     }
   ]
 }; const MOCKS={
@@ -701,14 +863,16 @@
     }
   }
 }
-;
+; const CSV_O="MRN,Client,Medication,Dose,Frequency,Route,Prescriber\nR-0004,Robert,Metformin,500 mg,BID,PO,Dr. [redacted]\nR-0004,Robert,Lisinopril,10 mg,Daily,PO,Dr. [redacted]\nR-0007,Dolores,Lisinopril,20 mg,Daily,PO,Dr. [redacted]\nR-0007,Dolores,Amlodipine,5 mg,Daily,PO,Dr. [redacted]\nR-0002,Marcus,Cephalexin,500 mg,QID,PO,Dr. [redacted]\nR-0002,Marcus,Acetaminophen,500 mg,PRN,PO,Dr. [redacted]\nR-0009,Client 9,Atorvastatin,40 mg,every evening,PO,Dr. [redacted]\nR-0009,Client 9,Warfarin,5 mg,per INR schedule,PO,Dr. [redacted]\n"; const CSV_M="MRN,Client,Medication,Dose,Administered Date,Administered Time,Status,Staff\nR-0004,Robert,Metformin,500 mg,2026-10-17,08:05,Self-administered,LVN [redacted]\nR-0004,Robert,Lisinopril,10 mg,2026-10-17,08:05,Self-administered,LVN [redacted]\nR-0007,Dolores,Lisinopril,20 mg,2026-10-17,08:20,Self-administered,LVN [redacted]\nR-0002,Marcus,Cephalexin,500 mg,2026-10-17,08:00,Self-administered,LVN [redacted]\nR-0002,Marcus,Cephalexin,500 mg,2026-10-17,12:10,Self-administered,LVN [redacted]\nR-0002,Marcus,Cephalexin,500 mg,2026-10-17,17:05,Refused,LVN [redacted]\nR-0002,Marcus,Ibuprofen,200 mg,2026-10-17,13:00,Self-administered,LVN [redacted]\nR-0009,Client 9,Atorvastatin,40 mg,2026-10-17,20:30,Self-administered,LVN [redacted]\nR-0009,Client 9,Warfarin,5 mg,2026-10-17,20:30,Self-administered,LVN [redacted]\nR-0004,Robert,Metformin,500 mg,2026-10-16,08:00,Self-administered,LVN [redacted]\nR-0004,Robert,Metformin,500 mg,2026-10-16,17:30,Self-administered,LVN [redacted]\n";
   const norm=s=>String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
   const json=(o,status=200)=>Promise.resolve({ok:status<300,status,json:()=>Promise.resolve(o)});
   const real=window.fetch.bind(window);
   window.fetch=function(url,opts){
-    if(typeof url==='string'&&url.startsWith('/api/')){
+    if(typeof url==='string'&&(url.startsWith('/api/')||url.startsWith('/data/'))){
       if(url==='/api/health') return json({ok:true,mode:'mock',models:[]});
       if(url==='/api/clients') return json({clients:CLIENTS.clients});
+      if(url==='/data/sample-kipu-orders.csv') return Promise.resolve({ok:true,text:()=>Promise.resolve(CSV_O)});
+      if(url==='/data/sample-kipu-mar.csv') return Promise.resolve({ok:true,text:()=>Promise.resolve(CSV_M)});
       if(url==='/api/draft'){ const b=JSON.parse(opts.body||'{}'); const c=CLIENTS.clients.find(x=>x.id===b.clientId);
         if(c&&MOCKS[c.id]&&norm(b.jottings)===norm(c.sample_jottings)) return json({mode:'mock',model:'sample',draft:MOCKS[c.id]});
         return json({error:'This hosted demo can only write up the sample sheet. Run it with an API key to write up your own lines.'},503); }
@@ -717,6 +881,7 @@
   };
 })();
 </script>
+
 <script>
 (function(){
   const $=s=>document.querySelector(s); const V=window.RoundsVerify;
@@ -783,7 +948,7 @@
   const FLOOR={left:[{bed:'1'},{bed:'2',client:'marcus'},{bed:'3'},{bed:'4',client:'robert'},{bed:'5'},{bed:'6'}],right:[{bed:'7',client:'dolores'},{bed:'8'},{bed:'9'},{bed:'10'},{bed:'11'},{bed:'12'}]};
   function bedState(c){
     const open=(c.passes||[]).filter(isOpen); const f=S.flags[c.id]||{};
-    const missed=open.some(p=>logOf(c,p)==='missed'); const pending=open.some(p=>!logOf(c,p));
+    const missed=open.some(p=>logOf(c,p)==='missed')||recGapFor(c)>0; const pending=open.some(p=>!logOf(c,p));
     const cls=missed?'miss':pending?'due':'ok';
     return {cls,flag:f.doctor||open.some(p=>logOf(c,p)==='side'),ready:f.ready,took:open.filter(p=>logOf(c,p)).length,open:open.length,vitals:!!f.vitals,note:!!S.done[c.id]};
   }
@@ -871,6 +1036,40 @@
     const miss=[]; S.clients.forEach(c=>{ const open=(c.passes||[]).filter(isOpen); open.filter(p=>!logOf(c,p)).forEach(p=>miss.push(`${nm(c)}: ${p} med pass not logged`)); if(!f(c).vitals) miss.push(`${nm(c)}: vitals not ticked`); if(!S.done[c.id]) miss.push(`${nm(c)}: no note yet`); });
     return `Still missing today (${new Date().toLocaleDateString()})\n\n`+(miss.length?miss.map(m=>'- '+m).join('\n'):'Nothing. Everything due so far is logged.')+`\n\nThis is the list a reviewer would build later. Better to see it now.`;
   }
+  // ---- med rec
+  const R={ord:null,mar:null,map:null,date:null,result:null};
+  const MR=window.MedRec;
+  function readFile(input,cb){ const f=input.files&&input.files[0]; if(!f) return; const fr=new FileReader(); fr.onload=()=>cb(fr.result,f.name); fr.readAsText(f); }
+  $('#ordFile').addEventListener('change',e=>readFile(e.target,(t,n)=>{R.ord=MR.parseCSV(t); $('#ordName').textContent=n+' · '+R.ord.rows.length+' rows'; e.target.closest('.drop').classList.add('has'); recReady();}));
+  $('#marFile').addEventListener('change',e=>readFile(e.target,(t,n)=>{R.mar=MR.parseCSV(t); $('#marName').textContent=n+' · '+R.mar.rows.length+' rows'; e.target.closest('.drop').classList.add('has'); recReady();}));
+  $('#sampleRec').onclick=async()=>{ const [o,m]=await Promise.all([fetch('/data/sample-kipu-orders.csv').then(r=>r.text()),fetch('/data/sample-kipu-mar.csv').then(r=>r.text())]);
+    R.ord=MR.parseCSV(o); R.mar=MR.parseCSV(m); $('#ordName').textContent='sample orders · '+R.ord.rows.length+' rows'; $('#marName').textContent='sample MAR · '+R.mar.rows.length+' rows'; document.querySelectorAll('.drop').forEach(d=>d.classList.add('has')); recReady(); runRec(); };
+  function recReady(){
+    if(!(R.ord&&R.mar)) return; R.map={orders:MR.guessColumns(R.ord.headers),mar:MR.guessColumns(R.mar.headers)};
+    const dates=MR.datesIn(R.mar,R.map.mar.date); R.date=dates[dates.length-1]||null; $('#runRec').disabled=false;
+    const roles=[['client','Client ID'],['med','Medication'],['dose','Dose'],['freq','Frequency'],['date','Date'],['time','Time'],['status','Status']];
+    const sel=(side,role)=>`<select data-side="${side}" data-role="${role}"><option value="">—</option>${(side==='orders'?R.ord:R.mar).headers.map(h=>`<option ${R.map[side][role]===h?'selected':''}>${esc(h)}</option>`).join('')}</select>`;
+    $('#recOpts').innerHTML=`<div class="recopts"><span>Day:</span><select id="recDate">${dates.map(d=>`<option ${d===R.date?'selected':''}>${d}</option>`).join('')}${dates.length?'':'<option>all rows</option>'}</select>
+      <details><summary>Which column is which (guessed from the headers)</summary><div class="mapgrid"><span></span><span class="h">Ordered file</span><span class="h">Taken file</span>${roles.map(([r,l])=>`<span class="h">${l}</span>${['freq','dose'].includes(r)||r==='client'||r==='med'||r==='time'?sel('orders',r):'<span></span>'}${r==='freq'?'<span></span>':sel('mar',r)}`).join('')}</div></details></div>`;
+    $('#recDate').onchange=e=>{R.date=e.target.value==='all rows'?null:e.target.value; runRec();};
+    $('#recOpts').querySelectorAll('select[data-side]').forEach(s=>s.onchange=()=>{R.map[s.dataset.side][s.dataset.role]=s.value||undefined; runRec();});
+  }
+  $('#runRec').onclick=runRec;
+  const nameForMrn=id=>{ const c=S.clients.find(x=>(x.mrn||'').toLowerCase()===String(id).toLowerCase()); return c?c.display:id; };
+  function runRec(){
+    if(!(R.ord&&R.mar&&R.map)) return; R.result=MR.compare(R.ord,R.mar,R.map,R.date); const r=R.result,t=r.totals;
+    const bar=i=>i.expected==null?'':`<span class="bar">${Array.from({length:i.expected},(_,k)=>`<i class="${k<i.taken?'':k<i.taken+i.refused?'r':'m'}"></i>`).join('')}</span>`;
+    let h=`<div class="kpis"><div class="kpi ${t.missedDoses?'bad':'good'}"><b>${t.missedDoses}</b><span>missed dose${t.missedDoses===1?'':'s'}</span></div><div class="kpi ${t.withGaps?'bad':'good'}"><b>${t.withGaps}<span style="font-size:14px;color:var(--ink-2)">/${t.clients}</span></b><span>clients with a gap</span></div><div class="kpi ${t.extras?'warn':'good'}"><b>${t.extras}</b><span>taken, no order</span></div><div class="kpi ${t.unknown?'warn':'good'}"><b>${t.unknown}</b><span>can't tell</span></div></div>`;
+    r.clients.forEach(c=>{ const gap=c.missed>0||c.extra.length; h+=`<div class="recc ${gap?'gap':''}"><div class="t">${esc(nameForMrn(c.client))}<span class="muted">${esc(c.client)}</span></div><ul>`;
+      c.items.forEach(i=>{ const txt=i.status==='unknown'?"can't tell how many were expected":i.status==='prn'?'as needed':`${i.taken} of ${i.expected}${i.refused?` · ${i.refused} refused`:''}`; h+=`<li class="${i.status}"><span>${esc(i.med)}${i.dose?' '+esc(i.dose):''} <span class="muted">${esc(i.freq||'')}</span></span><span>${bar(i)} ${txt}</span></li>`; });
+      c.extra.forEach(e=>{ h+=`<li class="extra"><span>${esc(e.med)}</span><span>taken${e.time?' at '+esc(e.time):''}, no order found</span></li>`; });
+      h+=`</ul></div>`; });
+    h+=`<div class="btns" style="margin-top:10px"><button class="btn main" id="copyRec">Copy the discrepancy list</button></div><p class="muted" style="font-size:13px;margin:8px 0 0">Expected doses come from the frequency on the order (BID = 2, QID = 4, "per INR schedule" = can't tell). A refused dose is shown, not hidden. Match is by client ID plus medication name; check the column guesses if something looks off.</p>`;
+    $('#recOut').innerHTML=h; $('#copyRec').onclick=()=>{ const txt=MR.discrepancyText(r,nameForMrn); const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok).catch(()=>fb(txt,ok)); else fb(txt,ok); };
+    renderFloor();
+  }
+  function recGapFor(c){ if(!R.result||!c.mrn) return 0; const row=R.result.clients.find(x=>x.client.toLowerCase()===c.mrn.toLowerCase()); return row?row.missed:0; }
+
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
   $('#teamBtn').onclick=()=>showDraft('team'); $('#auditBtn').onclick=()=>showDraft('audit');
   $('#resetLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');localStorage.removeItem('rounds.done');}catch(_){} location.reload();};

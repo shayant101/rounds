@@ -43,7 +43,8 @@
           "when": "Fri",
           "what": "wound clinic"
         }
-      ]
+      ],
+      "mrn": "R-0004"
     },
     {
       "id": "dolores",
@@ -86,7 +87,8 @@
           "when": "Thu",
           "what": "primary care"
         }
-      ]
+      ],
+      "mrn": "R-0007"
     },
     {
       "id": "marcus",
@@ -126,7 +128,8 @@
           "when": "Mon",
           "what": "wound check"
         }
-      ]
+      ],
+      "mrn": "R-0002"
     }
   ]
 }
