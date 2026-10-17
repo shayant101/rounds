@@ -13,22 +13,37 @@ An LVN or MA at IHH sees 15 to 20 clients a shift: vitals, watching clients take
 
 ## What we built
 
-Rounds is a browser page. No install, no login, no microphone, no connection to Kipu.
+Rounds is the nurse's pocket "brain sheet," on a phone. No install (add to home screen), no login, no microphone, no connection to Kipu. The word "AI" appears nowhere in it.
 
-1. **Who did you see.** Pick the client. Their care plan goals are shown.
-2. **Your jottings.** Type the way you'd write on paper. Shortcuts like `.bs` expand to "blood sugar" (yours to edit; there is deliberately no shortcut for "within normal limits").
-3. **What leaves this screen.** Names and ID-like numbers are removed in the browser before anything is sent, and the exact text the AI will get is shown.
-4. **The draft.** One line at a time. Each line shows the jotting it came from and the care plan goal it supports. A deterministic checker, not the AI, flags:
+1. **The whiteboard.** Rooms across the top, like the unit board. Tap a room. The client's care plan goals show as chips.
+2. **Tap, don't type.** Nine tiles: blood sugar, blood pressure, temp, watched meds, dressing, walked, they said, I taught, next. A tile asks only for the number or a few words, with one-tap context ("before lunch", "with walker"). Each tap becomes a line on the sheet, with an icon. Free text is still there for anything else.
+3. **What leaves your phone.** Names and ID-like numbers are removed in the browser before anything is sent, and the sheet says so in one line.
+4. **Make my note.** The draft slides in, grouped as *What I saw / What they told me / What I taught or did / What's next*. Touch any line and the sheet line it came from lights up yellow, like a highlighter. The same touch shows which box on the CalOptima care plan that line fills. A deterministic checker, not the AI, flags:
    - **red**: a line with no jotting behind it, a number that isn't in your jottings, or a filler phrase you didn't write ("tolerated well", "denies pain")
    - **amber**: interpretation an LVN doesn't document ("indicates", "consistent with", diagnosis words)
    You remove or keep each flagged line. The note cannot be copied until every flag has your decision.
-5. **Not in your jottings.** Up to three questions a reviewer might ask. Rounds never answers them for you.
-6. **Teach sheet.** The same jottings become a plain-language sheet for the client, English and Spanish, containing only the teaching you actually gave. Print it. This is aimed at the other time sink staff named: repeating the same counseling client after client.
-7. **Sign and copy.** Check "I read every line", copy, paste into Kipu's progress note field.
+5. **A reviewer might ask.** Up to three questions. Rounds never answers them for you.
+6. **Where it goes.** Your sheet → Kipu (your chart note) → CalOptima (care plan, every 30 days). Nurses are rarely shown this; it is why the note matters.
+7. **For the client to keep.** The same sheet becomes a plain-language teach sheet, English and Spanish, containing only the teaching you actually gave. Print it. This is aimed at the other time sink staff named: repeating the same counseling client after client.
+8. **Sign.** "This is what I saw and did. Nothing more." Copy for Kipu, paste into the progress note. Mark noted, and the room gets a check on the whiteboard: noted at the time, not at 6pm.
+
+### Why it looks the way it does
+
+- Nunito for the interface (rounded, big x-height, reads at a glance); Atkinson Hyperlegible for the note text itself, a face designed for legibility. No handwriting font: nurses read fast under bad light.
+- One brand color (scrub teal), highlighter yellow for the trace, coral only for "not your words". 48px touch targets, one-hand phone layout.
+- Two motions only: the lines sliding into the note, and the highlighter. Reduced-motion respected.
+- Copy says "your sheet", "your words", "make my note". Never "AI", "model", "generate".
+
+### The path to the systems IHH can't change
+
+- **Kipu (EMR):** Phase 1 is copy and paste into the progress note; the note is already structured JSON, so a Kipu integration is a mapping job, not a rewrite. We have not verified IHH's Kipu contract or API access.
+- **CalOptima Health (funder for Medi-Cal clients):** verified from CalOptima's Community Supports Provider Program Guide (Jan 2026): recuperative care is auto-authorized for 30 days; days 31–60 and 61–90 need a reauthorization in **CalOptima Health Connect** with the **care plan, including discharge planning notes**, uploaded. The care plan form (Appendix I) has the boxes our sections map to: Vital Signs; Care Preferences and Concerns Voiced by Member; Health Education/Interventions Provided; Interventions with status; Member Appointments. Phase 2 of Rounds assembles the signed notes into that field order at day 25/55/85 for whoever uploads. The nurse never touches Health Connect.
 
 **Demo video:** [link]
 
 ![Draft view](docs/screenshot-draft.png)
+
+<img src="docs/screenshot-phone.png" width="320" alt="Phone view">
 
 ## How Claude is used
 
@@ -67,7 +82,8 @@ Run the checks on all samples: `npm run eval` (writes `eval/results.md`).
 | Claude drafting | working when `ANTHROPIC_API_KEY` is set; **demo mode uses hand-written outputs** for the three sample clients, written to imitate real model output including one added sentence and one interpretation so the checks can be seen working |
 | Clients and care plan goals | made up; three samples |
 | Kipu integration | none, by design. Output is text you paste. Rounds never reads or writes IHH systems |
-| Saved shortcuts | stored in the browser only |
+| Name, rooms noted today | stored in the browser only |
+| Tile composing, highlighter, CalOptima box mapping | working; the mapping is our reading of CalOptima's Appendix I, not confirmed with CalOptima or IHH |
 
 ## Where it gets things wrong
 
