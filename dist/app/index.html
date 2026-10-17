@@ -272,9 +272,18 @@
   .gofind li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);background:var(--coral-2);font-weight:700}
   .gofind li svg{width:20px;height:20px;color:var(--coral)}
   .gofind li.ok{background:var(--sage-2)} .gofind li.ok svg{color:var(--sage)}
-  .due{display:grid;gap:8px}
-  .due .row{display:grid;grid-template-columns:minmax(80px,1fr) 3fr;gap:8px;align-items:center}
-  .due .nm{font-weight:800;font-size:15px}
+  .due{display:grid}
+  .due .row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--rule)}
+  .due .row:first-child{border-top:0}
+  .due .nm{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .due .nm .muted{font-weight:700}
+  .due .row.clear .nm{opacity:.55}
+  .due .chip.small{min-height:32px;padding:2px 10px;font-size:13px}
+  .due .flagbtn{min-height:32px;width:32px;padding:0;justify-content:center;border-radius:50%;background:transparent;border:2px solid var(--rule);color:var(--ink-2)}
+  .due .flagbtn.open,.due .flagbtn:hover{border-color:var(--ink);color:var(--ink)}
+  .due .flagbtn svg{width:14px;height:14px}
+  .due .alldone{font-size:13px;color:var(--sage);font-weight:700;display:inline-flex;align-items:center;gap:6px}
+  @media(max-width:559px){.due .row{grid-template-columns:1fr;gap:6px}}
   .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chip{min-height:40px;padding:4px 12px;border-radius:999px;background:var(--mist);font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px;border:2px solid transparent}
   .chip svg{width:16px;height:16px;flex:none}
@@ -316,6 +325,7 @@
   <symbol id="i-taught" viewBox="0 0 24 24"><path d="M4 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H4zM20 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
   <symbol id="i-next" viewBox="0 0 24 24"><path d="M4 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-note" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4m0 0h12l-2.5 4L17 12H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 
@@ -1514,15 +1524,19 @@
     // due today
     const d=$('#due');
     d.innerHTML=S.clients.map(c=>{ const f=S.flags[c.id]||{}; const open=(c.passes||[]).filter(isOpen); const took=open.filter(p=>logOf(c,p)); const [name,room]=c.display.split(' · ');
-      return `<div class="row"><div class="nm">${esc(room.replace('Room ','Rm '))}<br><span class="muted">${esc(name)}</span></div><div class="chips">
-        <span class="chip auto ${open.length&&took.length===open.length?'on':''}">${svg('pill')} meds ${took.length}/${open.length}</span>
-        <button class="chip ${f.vitals?'on':''}" data-flag="vitals" data-c="${c.id}">${svg('heart')} vitals</button>
-        <button class="chip ${S.done[c.id]?'on':''}" data-pick="${c.id}">${svg('note')} note</button>
-        ${(c.appointments||[]).length?`<button class="chip ${f.appt?'on':''}" data-flag="appt" data-c="${c.id}">${svg('next')} ${esc(c.appointments[0].what)} ${esc(c.appointments[0].when)}</button>`:''}
-        <button class="chip flag ${f.doctor?'on':''}" data-flag="doctor" data-c="${c.id}">doctor should look</button>
-        <button class="chip ready ${f.ready?'on':''}" data-flag="ready" data-c="${c.id}">ready soon</button>
+      const medsDone=open.length&&took.length===open.length; const allDone=medsDone&&f.vitals&&S.done[c.id]; const fo=S.flagOpen===c.id; const ap=(c.appointments||[])[0];
+      const tags=(f.doctor?`<button class="chip small flag on" data-flag="doctor" data-c="${c.id}">doctor should look</button>`:'')+(f.ready?`<button class="chip small ready on" data-flag="ready" data-c="${c.id}">ready soon</button>`:'');
+      const work=allDone?`<span class="alldone">${svg('shield')} all done today</span>`:
+        `<span class="chip small auto ${medsDone?'on':''}">${svg('pill')} meds ${took.length}/${open.length}</span>
+        <button class="chip small ${f.vitals?'on':''}" data-flag="vitals" data-c="${c.id}">${svg('heart')} vitals</button>
+        <button class="chip small ${S.done[c.id]?'on':''}" data-pick="${c.id}">${svg('note')} note</button>
+        ${ap?`<button class="chip small ${f.appt?'on':''}" data-flag="appt" data-c="${c.id}">${svg('next')} ${esc(ap.when)} ${esc(ap.what)}</button>`:''}`;
+      const picker=fo?`<button class="chip small flag ${f.doctor?'on':''}" data-flag="doctor" data-c="${c.id}">doctor should look</button><button class="chip small ready ${f.ready?'on':''}" data-flag="ready" data-c="${c.id}">ready soon</button>`:'';
+      return `<div class="row ${allDone?'clear':''}"><div class="nm">${esc(room.replace('Room ','Rm '))} <span class="muted">${esc(name)}</span></div><div class="chips">
+        ${work}${fo?'':tags}${picker}<button class="chip flagbtn ${fo?'open':''}" data-flagopen="${c.id}" aria-label="flag ${esc(name)}" title="Flag">${fo?'×':svg('flag')}</button>
       </div></div>`; }).join('');
-    d.querySelectorAll('[data-flag]').forEach(b=>b.onclick=()=>{ const c=b.dataset.c; S.flags[c]=S.flags[c]||{}; S.flags[c][b.dataset.flag]=!S.flags[c][b.dataset.flag]; store.set('flags.'+today,S.flags); renderHome(); });
+    d.querySelectorAll('[data-flagopen]').forEach(b=>b.onclick=()=>{ S.flagOpen=S.flagOpen===b.dataset.flagopen?null:b.dataset.flagopen; renderHome(); });
+    d.querySelectorAll('[data-flag]').forEach(b=>b.onclick=()=>{ const c=b.dataset.c; S.flags[c]=S.flags[c]||{}; S.flags[c][b.dataset.flag]=!S.flags[c][b.dataset.flag]; if(b.dataset.flag==='doctor'||b.dataset.flag==='ready') S.flagOpen=null; store.set('flags.'+today,S.flags); renderHome(); });
     d.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pick(S.clients.find(c=>c.id===b.dataset.pick)));
   }
   function draftText(kind){
