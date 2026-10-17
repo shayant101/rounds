@@ -29,6 +29,14 @@
   .wm{font-size:32px;font-weight:900;letter-spacing:-.04em;line-height:1} .wm i{font-style:normal;color:var(--teal)}
   header b{font-size:20px;font-weight:900}
   header span{color:var(--ink-2);font-size:14px}
+  .topnav{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .topnav a{text-decoration:none;font-weight:800;font-size:14px;min-height:40px;display:inline-flex;align-items:center;border-radius:999px;padding:0 14px}
+  .topnav .pill{color:var(--ink);border:2px solid var(--rule);background:var(--paper)}
+  .topnav .pill:hover{border-color:var(--teal)}
+  .topnav .cta{background:#81E40A;color:#0B0D0B;font-weight:900;padding:0 18px;white-space:nowrap}
+  @media(max-width:420px){.topnav .cta{padding:0 12px;font-size:13px} header{gap:10px}}
+  .topnav .cta:hover{filter:brightness(1.05)}
+  @media(max-width:760px){.topnav .pill{display:none}}
   .hero{display:grid;gap:28px;padding:24px 0 10px}
   @media(min-width:900px){.hero{grid-template-columns:1.1fr 1fr;align-items:center}}
   h1{font-size:clamp(34px,6vw,54px);line-height:1.02;letter-spacing:-.02em;margin:0 0 14px;font-weight:900}
@@ -80,7 +88,7 @@
 </head>
 <body>
 <div class="wrap">
-  <header><img class="mark light-only" src="brand/mark-black.png" alt=""><img class="mark dark-only" src="brand/mark-grey.png" alt=""><div class="lockup"><b class="wm">rounds<i>.</i></b><span class="tag">Recuperative care</span></div><span style="margin-left:auto"><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span></header>
+  <header><img class="mark light-only" src="brand/mark-black.png" alt=""><img class="mark dark-only" src="brand/mark-grey.png" alt=""><div class="lockup"><b class="wm">rounds<i>.</i></b><span class="tag">Recuperative care</span></div><nav class="topnav" aria-label="Demo"><a class="pill" href="program/index.html">Program view</a><a class="pill" href="views/index.html">Laptop · tablet · phone</a><a class="pill" href="https://github.com/shayant101/rounds" target="_blank" rel="noopener">Source</a><a class="cta" href="app/index.html">Try the demo →</a></nav><span><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span></header>
 
   <section class="hero">
     <div>
