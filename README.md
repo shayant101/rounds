@@ -30,6 +30,7 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 - **Med pass board:** rooms by pass times. Tap a cell: *Took it, I watched* / *Didn't come* / *Side effect*. That tap is the med log.
 - **Go find:** who to chase for the open pass, and who missed earlier.
 - **Due today:** per room, meds done out of open passes, vitals, note, appointment; plus two flags that are hers: *doctor should look* and *ready soon*.
+- **Hand off:** at the end of the shift, "Prepare handoff" writes the handoff from the day (missed and unlogged passes, side effects, med rec gaps, doctor / ready flags, unconfirmed appointments), she adds what only she knows per client and for the floor, then "Hand off." The next person opens Rounds and sees it at the top of their floor, item by item, ticking each one as read. Copy and print for the paper people.
 - **Send:** *Message the team* drafts the shift update ("Ready to move out soon: …, A doctor should look at: …, Missed a med pass: …"). *What's still missing* builds the list a reviewer would build later, now. Both copy to the clipboard; Rounds sends nothing.
 
 **Writing up a room**

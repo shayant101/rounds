@@ -206,6 +206,23 @@
   .bar{display:inline-flex;gap:2px}
   .bar i{width:10px;height:10px;border-radius:3px;background:var(--sage)} .bar i.m{background:var(--coral)} .bar i.r{background:var(--amber)}
 
+  /* handoff */
+  .ho{margin-top:12px;display:grid;gap:10px}
+  .ho .c{border:2px solid var(--rule);border-radius:var(--r);padding:10px 12px}
+  .ho .c b{display:block;margin-bottom:4px}
+  .ho .c ul{margin:0 0 6px;padding-left:18px;font-size:15px}
+  .ho .c li.auto{color:var(--ink-2)}
+  .ho textarea,.ho input{width:100%;border:2px dashed var(--rule);border-radius:var(--r-sm);padding:8px 10px;background:transparent;font:inherit;font-size:15px;min-height:44px;resize:vertical}
+  .ho .gen textarea{min-height:60px}
+  .incoming{background:var(--hl);color:var(--hl-ink);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px}
+  .incoming h2{margin:0;font-size:18px;font-weight:800}
+  .incoming .c{background:rgba(255,255,255,.55);border-radius:var(--r-sm);padding:8px 10px}
+  .incoming .c b{display:block}
+  .incoming label{display:flex;gap:8px;align-items:flex-start;font-size:15px;padding:3px 0;cursor:pointer}
+  .incoming input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--teal);flex:none}
+  .incoming label.done{opacity:.55;text-decoration:line-through}
+  .incoming .btns .btn{background:rgba(255,255,255,.7)}
+
   /* my shift */
   .home{display:grid;gap:14px;min-width:0} .home>*{min-width:0}
   .panel{background:var(--paper);border-radius:var(--r);padding:16px}
@@ -295,6 +312,7 @@
     <div class="board" id="board" role="tablist"></div>
 
     <section class="home" id="home">
+      <div id="incoming"></div>
       <div class="insight" id="insight"></div>
       <div class="panel floorpanel">
         <div class="ph"><h2>The floor</h2><span class="muted">tap a bed</span></div>
@@ -328,6 +346,12 @@
         <div class="ph"><h2>Send</h2><span class="muted">drafts only, you send</span></div>
         <div class="btns"><button class="btn" id="teamBtn">Message the team</button><button class="btn" id="auditBtn">What's still missing</button></div>
         <pre class="draftbox" id="draftbox" hidden></pre>
+      </div>
+      <div class="panel" id="handoffPanel">
+        <div class="ph"><h2>Hand off</h2><span class="muted">for the next shift</span></div>
+        <p class="muted" style="margin:0 0 10px;font-size:14px">It starts from what happened today. Add what only you know.</p>
+        <div class="btns"><button class="btn main" id="prepHandoff">Prepare handoff</button></div>
+        <div id="handoffOut"></div>
       </div>
       <p class="muted" style="font-size:14px;margin:0">Tap a room above to write it up.</p>
     </section>
@@ -456,7 +480,7 @@
     else if(pending.length) ins=`${pending.length===1?'1 client hasn\'t':pending.length+' clients haven\'t'} come for the ${cur} pass yet: ${pending.map(c=>c.display.split(' · ')[0]).join(', ')}.`;
     else { ins=`Everyone is logged for the ${cur} pass.${missedToday.length?` ${missedToday.length} missed earlier today.`:' Nice.'}`; calm=!missedToday.length; }
     const el=$('#insight'); el.textContent=ins; el.className='insight'+(calm?' calm':'');
-    renderFloor();
+    renderFloor(); renderIncoming();
     $('#passClock').textContent=cur?`${cur} pass is open`:'';
     // grid
     const g=$('#passgrid'); g.style.setProperty('--np',passes.length);
@@ -546,6 +570,57 @@
     renderFloor();
   }
   function recGapFor(c){ if(!R.result||!c.mrn) return 0; const row=R.result.clients.find(x=>x.client.toLowerCase()===c.mrn.toLowerCase()); return row?row.missed:0; }
+
+  // ---- shift handoff
+  const shiftName=()=>{ const h=new Date().getHours(); return h>=6&&h<18?'day shift':'night shift'; };
+  function autoItems(c){
+    const f=S.flags[c.id]||{}; const open=(c.passes||[]).filter(isOpen); const items=[];
+    open.filter(p=>logOf(c,p)==='missed').forEach(p=>items.push(`Missed the ${p} med pass`));
+    open.filter(p=>!logOf(c,p)).forEach(p=>items.push(`${p} med pass not logged`));
+    open.filter(p=>logOf(c,p)==='side').forEach(p=>items.push(`Side effect at ${p}${S.log[c.id][p+':note']?': '+S.log[c.id][p+':note']:''}`));
+    const g=recGapFor(c); if(g) items.push(`Med rec: ${g} dose${g>1?'s':''} missed vs. orders`);
+    if(f.doctor) items.push('A doctor should look');
+    if(f.ready) items.push('Ready to move out soon');
+    (c.appointments||[]).forEach(a=>items.push(`${a.what} ${a.when}${f.appt?' (confirmed)':' (not confirmed)'}`));
+    return items;
+  }
+  let HO=null;
+  $('#prepHandoff').onclick=()=>{
+    HO={from:S.profile.name,shift:shiftName(),at:new Date().toISOString(),general:'',clients:S.clients.map(c=>({id:c.id,display:c.display,auto:autoItems(c),extra:''}))};
+    renderHandoff();
+  };
+  function renderHandoff(){
+    const box=$('#handoffOut'); if(!HO){box.innerHTML='';return;}
+    box.innerHTML=`<div class="ho">${HO.clients.map(c=>`<div class="c"><b>${esc(c.display)}</b><ul>${c.auto.length?c.auto.map(a=>`<li class="auto">${esc(a)}</li>`).join(''):'<li class="auto">Nothing flagged today</li>'}</ul><input type="text" data-extra="${c.id}" placeholder="Anything only you know? (optional)" value="${esc(c.extra)}"></div>`).join('')}
+      <div class="c gen"><b>For the whole floor</b><textarea data-general placeholder="Anything else: supplies, visitors expected, who to call…">${esc(HO.general)}</textarea></div>
+      <div class="btns"><button class="btn main" id="doHandoff">Hand off to the next shift</button><button class="btn" id="copyHandoff">Copy</button><button class="btn" id="printHandoff">Print</button></div>
+      <p class="muted" style="font-size:13px;margin:0">The next person opens Rounds and sees this at the top of their floor, item by item, until they tick each one.</p></div>`;
+    box.querySelectorAll('[data-extra]').forEach(i=>i.oninput=()=>{HO.clients.find(c=>c.id===i.dataset.extra).extra=i.value;});
+    box.querySelector('[data-general]').oninput=e=>{HO.general=e.target.value;};
+    $('#doHandoff').onclick=()=>{ HO.at=new Date().toISOString(); HO.ack={}; store.set('handoff',HO); toast('Handed off. Get home safe.'); HO=null; renderHandoff(); renderIncoming(); };
+    $('#copyHandoff').onclick=()=>{ const t=handoffText(HO); const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); };
+    $('#printHandoff').onclick=()=>{ const pa=$('#printArea'); pa.hidden=false; pa.innerHTML=`<h2>Handoff · ${esc(HO.from)} · ${esc(HO.shift)}</h2><pre style="white-space:pre-wrap;font:18px/1.6 var(--note)">${esc(handoffText(HO))}</pre>`; window.print(); setTimeout(()=>pa.hidden=true,500); };
+  }
+  function handoffText(h){
+    const lines=[`Handoff from ${h.from} (${h.shift}), ${new Date(h.at).toLocaleString()}`,''];
+    h.clients.forEach(c=>{ const all=[...c.auto,...(c.extra?[c.extra]:[])]; if(!all.length) return; lines.push(c.display); all.forEach(a=>lines.push('  - '+a)); });
+    if(h.general.trim()) lines.push('','Floor: '+h.general.trim());
+    return lines.join('\n');
+  }
+  function renderIncoming(){
+    const h=store.get('handoff',null); const box=$('#incoming');
+    if(!h||!h.clients){ box.innerHTML=''; return; }
+    const ack=h.ack||{}; const items=[]; h.clients.forEach(c=>{ [...c.auto,...(c.extra?[c.extra]:[])].forEach((a,i)=>items.push({k:c.id+':'+i,c:c.display,a})); });
+    if(h.general.trim()) items.push({k:'general',c:'Floor',a:h.general.trim()});
+    const left=items.filter(i=>!ack[i.k]).length;
+    if(!items.length){ box.innerHTML=''; return; }
+    const groups={}; items.forEach(i=>(groups[i.c]=groups[i.c]||[]).push(i));
+    box.innerHTML=`<div class="incoming"><h2>Handoff from ${esc(h.from)}, ${esc(h.shift)} · ${new Date(h.at).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}</h2>
+      ${Object.entries(groups).map(([c,arr])=>`<div class="c"><b>${esc(c)}</b>${arr.map(i=>`<label class="${ack[i.k]?'done':''}"><input type="checkbox" data-ack="${esc(i.k)}" ${ack[i.k]?'checked':''}><span>${esc(i.a)}</span></label>`).join('')}</div>`).join('')}
+      <div class="btns"><span class="muted" style="align-self:center">${left?left+' to go':'All read.'}</span>${left?'':'<button class="btn" id="clearHandoff">Clear</button>'}</div></div>`;
+    box.querySelectorAll('[data-ack]').forEach(cb=>cb.onchange=()=>{ h.ack=h.ack||{}; h.ack[cb.dataset.ack]=cb.checked; store.set('handoff',h); renderIncoming(); });
+    const cl=$('#clearHandoff'); if(cl) cl.onclick=()=>{ try{localStorage.removeItem('rounds.handoff');}catch(e){} renderIncoming(); };
+  }
 
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
   $('#teamBtn').onclick=()=>showDraft('team'); $('#auditBtn').onclick=()=>showDraft('audit');
