@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node server/index.js",
-    "eval": "node eval/run.js"
+    "eval": "node eval/run.js",
+    "build:static": "node scripts/build-static.js"
   },
   "keywords": [],
   "author": "",
