@@ -43,8 +43,9 @@
   .hmark{width:34px;height:34px;object-fit:contain;margin-top:4px;opacity:.9}
   :root[data-theme="light"] .hmark{content:url(brand/mark-black.png)}
   .top p{margin:4px 0 0;color:var(--ink-2)}
-  .dots{display:flex;gap:5px;align-items:center}
-  .dots i{width:10px;height:10px;border-radius:50%;background:var(--rule);display:block}
+  .dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:112px;justify-content:flex-end}
+  @media(min-width:560px){.dots{max-width:none}}
+  .dots i{width:8px;height:8px;border-radius:50%;background:var(--rule);display:block}
   .dots i.on{background:var(--sage)}
   .board{display:flex;gap:8px;overflow-x:auto;padding:6px 0 14px;scrollbar-width:none}
   .board::-webkit-scrollbar{display:none}
@@ -480,7 +481,7 @@
   function goHome(){ S.client=null; S.draft=null; S.selCell=null; $('#cols').hidden=true; $('#home').hidden=false; $('#board').hidden=true; renderBoard(); renderHome(); window.scrollTo({top:0}); }
 
   // the floor: one wing, beds in two rows of a dorm with an aisle. Made-up layout.
-  const FLOOR={left:[{bed:'1'},{bed:'2',client:'marcus'},{bed:'3'},{bed:'4',client:'robert'},{bed:'5'},{bed:'6'}],right:[{bed:'7',client:'dolores'},{bed:'8'},{bed:'9'},{bed:'10'},{bed:'11'},{bed:'12'}]};
+  const FLOOR={left:[{bed:'1',client:'elena'},{bed:'2',client:'marcus'},{bed:'3',client:'tomas'},{bed:'4',client:'robert'},{bed:'5',client:'grace'},{bed:'6',client:'darnell'},{bed:'7',client:'dolores'},{bed:'8',client:'linh'},{bed:'9',client:'hector'}],right:[{bed:'10',client:'aisha'},{bed:'11',client:'walter'},{bed:'12',client:'yesenia'},{bed:'13',client:'samuel'},{bed:'14',client:'nadia'},{bed:'15',client:'ray'},{bed:'16'},{bed:'17'},{bed:'18'}]};
   function bedState(c){
     const open=(c.passes||[]).filter(isOpen); const f=S.flags[c.id]||{};
     const missed=open.some(p=>logOf(c,p)==='missed')||recGapFor(c)>0; const pending=open.some(p=>!logOf(c,p));
@@ -511,7 +512,7 @@
     const side=S.clients.flatMap(c=>(c.passes||[]).filter(p=>logOf(c,p)==='side').map(p=>({c,p})));
     let ins, calm=false;
     if(!cur) { ins='No med pass open yet. First one is at 8am.'; calm=true; }
-    else if(pending.length) ins=`${pending.length===1?'1 client hasn\'t':pending.length+' clients haven\'t'} come for the ${cur} pass yet: ${pending.map(c=>c.display.split(' · ')[0]).join(', ')}.`;
+    else if(pending.length) ins=`${pending.length===1?'1 client hasn\'t':pending.length+' clients haven\'t'} come for the ${cur} pass yet: ${pending.slice(0,5).map(c=>c.display.split(' · ')[0]).join(', ')}${pending.length>5?' and '+(pending.length-5)+' more':''}.`;
     else { ins=`Everyone is logged for the ${cur} pass.${missedToday.length?` ${missedToday.length} missed earlier today.`:' Nice.'}`; calm=!missedToday.length; }
     const el=$('#insight'); el.textContent=ins; el.className='insight'+(calm?' calm':'');
     renderFloor(); renderIncoming();

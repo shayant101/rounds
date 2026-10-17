@@ -121,7 +121,7 @@
     const completion=open?Math.round(100*logged/open):100;
     const rec=store('medrec.'+today); // written by the floor when med rec runs
     const missed=(rec&&rec.missedDoses)||missedPass;
-    return {name:'Site A · this device',beds:12,census:n,staff:'demo floor',live:true,hist:{missed:[1,2,1,0,2,1,missed],completion:[96,93,97,100,92,95,completion]},side,doctor,ready,notes:n?Math.round(100*noted/n):0,handoff:!!(ho&&ho.clients),reauth:1,openPasses:open,logged};
+    return {name:'Site A · this device',beds:18,census:n,staff:'demo floor',live:true,hist:{missed:[1,2,1,0,2,1,missed],completion:[96,93,97,100,92,95,completion]},side,doctor,ready,notes:n?Math.round(100*noted/n):0,handoff:!!(ho&&ho.clients),reauth:1,openPasses:open,logged};
   }
 
   function verdict(s){
