@@ -7,7 +7,7 @@
 <meta name="description" content="The shift on one screen for recuperative care nurses. You tap. You sign.">
 <meta name="theme-color" content="#0B0D0B">
 <script>(function(){try{var t=localStorage.getItem("rounds.theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%230B0D0B%22%2F%3E%3Cpath%20d%3D%22M18%2020h20M18%2030h28M18%2040h16%22%20stroke%3D%22%2381E40A%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%2040l6%206%2010-12%22%20stroke%3D%22%2381E40A%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E%0A">
+<link rel="icon" href="brand/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -20,8 +20,10 @@
   body{margin:0;background:var(--mist);color:var(--ink);font:500 17px/1.55 "Nunito",system-ui,sans-serif}
   .wrap{max-width:1040px;margin:0 auto;padding:0 16px 60px}
   header{display:flex;align-items:center;gap:12px;padding:18px 0}
-  .logo{width:40px;height:40px;border-radius:12px;background:var(--teal);display:grid;place-items:center}
-  .logo svg{width:26px;height:26px}
+  .mark{width:44px;height:44px;object-fit:contain}
+  .light-only{display:none} .dark-only{display:block}
+  :root[data-theme="light"] .light-only{display:block} :root[data-theme="light"] .dark-only{display:none}
+  .wm{font-size:24px;font-weight:900;letter-spacing:-.03em} .wm i{font-style:normal;color:var(--teal)}
   header b{font-size:20px;font-weight:900}
   header span{color:var(--ink-2);font-size:14px}
   .hero{display:grid;gap:28px;padding:24px 0 10px}
@@ -54,7 +56,7 @@
   .q small{display:block;color:var(--ink-2);margin-top:8px;font-size:14px}
   .steps{margin:34px 0 0;display:grid;gap:10px}
   .step{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
-  .step i{width:44px;height:44px;border-radius:50%;background:var(--teal-2);color:var(--teal);display:grid;place-items:center;font-style:normal;font-weight:900}
+  .step i{width:44px;height:44px;border-radius:50%;background:var(--teal-2);color:var(--teal);display:grid;place-items:center;font-style:normal;font-weight:900;font-size:13px}
   .step b{display:block;font-size:17px} .step span{color:var(--ink-2);font-size:15px}
   .trust{margin-top:34px;display:grid;gap:8px;font-size:15px;color:var(--ink-2)}
   .trust li{list-style:none;padding-left:26px;position:relative} .trust li::before{content:"✓";position:absolute;left:0;color:var(--sage);font-weight:900}
@@ -75,11 +77,11 @@
 </head>
 <body>
 <div class="wrap">
-  <header><div class="logo"><svg viewBox="0 0 64 64"><path d="M18 20h20M18 30h28M18 40h16" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round"/><path d="M40 40l6 6 10-12" stroke="#0B0D0B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><b>Rounds</b><br><span>for recuperative care</span></div><span style="margin-left:auto"><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span></header>
+  <header><img class="mark light-only" src="brand/mark-black.png" alt=""><img class="mark dark-only" src="brand/mark-grey.png" alt=""><div><b class="wm">rounds<i>.</i></b><br><span>for recuperative care</span></div><span style="margin-left:auto"><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span></header>
 
   <section class="hero">
     <div>
-      <h1>Your shift.<br>One screen.</h1>
+      <h1>Your shift.<br>One screen<i style="font-style:normal;color:var(--teal)">.</i></h1>
       <p class="lede">Med pass, med rec, handoff, notes. You tap. You sign.</p>
       <div class="doors">
         <button class="door" data-role="floor"><b>I'm on the floor</b><span>LVN · medical assistant</span><span class="go">Open my floor →</span></button>
@@ -105,9 +107,11 @@
   <blockquote class="q">"If they took it and you didn't document it, the insurance company isn't going to pay."<small>IHH staff. In Rounds, the tap is the log.</small></blockquote>
 
   <section class="steps">
-    <div class="step"><i>1</i><div><b>Start</b><span>Your floor. Last shift's handoff on top.</span></div></div>
-    <div class="step"><i>2</i><div><b>Work the beds</b><span>Tap it or say it. "BP 120 over 80 for Robert."</span></div></div>
-    <div class="step"><i>3</i><div><b>Sign</b><span>Note to Kipu. Teach sheet to the client. Handoff to the night.</span></div></div>
+    <div class="step"><i>7a</i><div><b>Start</b><span>Your floor. Last shift's handoff on top.</span></div></div>
+    <div class="step"><i>8a</i><div><b>Med pass</b><span>The tap is the log. Who didn't come is one line.</span></div></div>
+    <div class="step"><i>10a</i><div><b>Rounds</b><span>Tap it or say it. "BP 120 over 80 for Robert."</span></div></div>
+    <div class="step"><i>2p</i><div><b>Med rec</b><span>Kipu's two exports in. Missed doses out.</span></div></div>
+    <div class="step"><i>6p</i><div><b>Sign</b><span>Nothing is filed until you sign. Note to Kipu, teach sheet to the client, handoff to the night.</span></div></div>
   </section>
 
   <section class="trust"><ul>

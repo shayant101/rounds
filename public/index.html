@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#0B0D0B">
 <link rel="manifest" href="manifest.json">
 <script>(function(){try{var t=localStorage.getItem("rounds.theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
-<link rel="icon" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="brand/favicon.png">
+<link rel="apple-touch-icon" href="brand/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
@@ -40,6 +40,8 @@
   /* greeting + whiteboard */
   .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:20px 0 8px}
   .top h1{font-size:28px;line-height:1.1;margin:0;font-weight:800;letter-spacing:-.01em}
+  .hmark{width:34px;height:34px;object-fit:contain;margin-top:4px;opacity:.9}
+  :root[data-theme="light"] .hmark{content:url(brand/mark-black.png)}
   .top p{margin:4px 0 0;color:var(--ink-2)}
   .dots{display:flex;gap:5px;align-items:center}
   .dots i{width:10px;height:10px;border-radius:50%;background:var(--rule);display:block}
@@ -326,7 +328,7 @@
 
   <div id="app" hidden>
     <div class="top">
-      <div><h1 id="greet">Good morning</h1><p id="sub">Pick a room to start.</p></div>
+      <div style="display:flex;gap:12px;align-items:flex-start"><img src="brand/mark-grey.png" alt="" class="hmark"><div><h1 id="greet">Good morning</h1><p id="sub">Pick a room to start.</p></div></div>
       <div style="display:flex;align-items:center;gap:10px"><div class="dots" id="dots" aria-label="rooms noted today"></div><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
     </div>
     <div class="board" id="board" role="tablist"></div>
