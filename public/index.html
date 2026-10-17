@@ -375,7 +375,7 @@
       </section>
     </div>
 
-    <p class="foot">Rounds keeps everything on this device. It never writes to Kipu or to CalOptima. <a href="#" id="resetLink">Start over</a></p>
+    <p class="foot">Rounds keeps everything on this device. It never writes to Kipu or to CalOptima. <a href="program.html">Program view for IHH staff</a> · <a href="#" id="resetLink">Start over</a></p>
   </div>
 </div>
 <div id="printArea" hidden></div>
@@ -566,6 +566,7 @@
       c.extra.forEach(e=>{ h+=`<li class="extra"><span>${esc(e.med)}</span><span>taken${e.time?' at '+esc(e.time):''}, no order found</span></li>`; });
       h+=`</ul></div>`; });
     h+=`<div class="btns" style="margin-top:10px"><button class="btn main" id="copyRec">Copy the discrepancy list</button></div><p class="muted" style="font-size:13px;margin:8px 0 0">Expected doses come from the frequency on the order (BID = 2, QID = 4, "per INR schedule" = can't tell). A refused dose is shown, not hidden. Match is by client ID plus medication name; check the column guesses if something looks off.</p>`;
+    store.set('medrec.'+today,{missedDoses:t.missedDoses,withGaps:t.withGaps,extras:t.extras});
     $('#recOut').innerHTML=h; $('#copyRec').onclick=()=>{ const txt=MR.discrepancyText(r,nameForMrn); const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok).catch(()=>fb(txt,ok)); else fb(txt,ok); };
     renderFloor();
   }

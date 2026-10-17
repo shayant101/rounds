@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rounds · Program view</title>
+<meta name="description" content="What's going on across every site, for IHH program staff.">
+<meta name="theme-color" content="#1F6F78">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%231F6F78%22%2F%3E%3Cpath%20d%3D%22M18%2020h20M18%2030h28M18%2040h16%22%20stroke%3D%22%23F3F6F5%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%2F%3E%3Cpath%20d%3D%22M40%2040l6%206%2010-12%22%20stroke%3D%22%23F8E16C%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E%0A">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--mist:#F3F6F5;--paper:#fff;--ink:#1C2A2A;--ink-2:#5B6B69;--rule:#DCE4E2;--teal:#1F6F78;--teal-2:#E3F0F1;--on-teal:#fff;--hl:#F8E16C;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--amber-2:#FBF1DC;--sage:#2E7D5B;--sage-2:#E4F2EA;--r:14px;--r-sm:10px}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--mist:#141B1B;--paper:#1C2525;--ink:#EEF3F2;--ink-2:#A6B5B2;--rule:#2B3736;--teal:#5FC4CC;--teal-2:#173536;--on-teal:#0B1A1B;--hl:#E6CF4A;--coral:#FF8F86;--coral-2:#3B1F1D;--amber:#F0B860;--amber-2:#3A2E14;--sage:#7FD6A6;--sage-2:#173328}}
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  body{margin:0;background:var(--mist);color:var(--ink);font:500 16px/1.5 "Nunito",system-ui,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 16px 80px}
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:20px 0 12px;flex-wrap:wrap}
+  .top h1{font-size:26px;margin:0;font-weight:800;letter-spacing:-.01em}
+  .top p{margin:4px 0 0;color:var(--ink-2)}
+  .top a{color:var(--teal);font-weight:800;text-decoration:none}
+  .program{background:var(--paper);border-radius:var(--r);padding:16px;margin-bottom:14px}
+  .program h2{margin:0 0 8px;font-size:18px;font-weight:800}
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  @media(min-width:700px){.kpis{grid-template-columns:repeat(5,1fr)}}
+  .kpi{background:var(--mist);border-radius:var(--r-sm);padding:10px;text-align:center}
+  .kpi b{display:block;font-size:28px;line-height:1.1}
+  .kpi span{font-size:12px;color:var(--ink-2)}
+  .kpi.bad b{color:var(--coral)} .kpi.warn b{color:var(--amber)} .kpi.good b{color:var(--sage)}
+  .flags{margin-top:12px;display:grid;gap:6px}
+  .flag{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:var(--r-sm);background:var(--coral-2)}
+  .flag.warn{background:var(--amber-2)}
+  .flag i{width:12px;height:12px;border-radius:50%;background:var(--coral);margin-top:6px;display:block}
+  .flag.warn i{background:var(--amber)}
+  .flag b{display:block}
+  .flag span{font-size:14px;color:var(--ink-2)}
+  .sites{display:grid;gap:12px}
+  @media(min-width:860px){.sites{grid-template-columns:repeat(2,1fr)}}
+  .site{background:var(--paper);border-radius:var(--r);padding:16px;border-left:6px solid var(--rule)}
+  .site.red{border-left-color:var(--coral)} .site.watch{border-left-color:var(--amber)} .site.steady{border-left-color:var(--sage)}
+  .site .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .site h3{margin:0;font-size:19px;font-weight:800}
+  .site .verdict{margin-left:auto;font-weight:800;padding:4px 12px;border-radius:999px;font-size:13px}
+  .red .verdict{background:var(--coral-2);color:var(--coral)} .watch .verdict{background:var(--amber-2);color:var(--amber)} .steady .verdict{background:var(--sage-2);color:var(--sage)}
+  .site .sub{color:var(--ink-2);font-size:13px;margin:2px 0 10px}
+  .site .live{font-size:12px;font-weight:800;color:var(--teal);background:var(--teal-2);padding:2px 8px;border-radius:999px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .m{background:var(--mist);border-radius:8px;padding:8px 6px;text-align:center}
+  .m b{display:block;font-size:20px;line-height:1.1}
+  .m span{font-size:11px;color:var(--ink-2);display:block}
+  .m.bad b{color:var(--coral)} .m.warn b{color:var(--amber)} .m.good b{color:var(--sage)}
+  .trend{margin-top:10px;display:flex;align-items:flex-end;gap:10px}
+  .trend .lbl{font-size:12px;color:var(--ink-2);width:110px;line-height:1.3}
+  .bars{display:flex;align-items:flex-end;gap:3px;height:34px;flex:1}
+  .bars i{flex:1;background:var(--rule);border-radius:3px 3px 0 0;min-height:3px}
+  .bars i.bad{background:var(--coral)} .bars i.warn{background:var(--amber)} .bars i.ok{background:var(--sage)}
+  .bars i.today{outline:2px solid var(--teal);outline-offset:1px}
+  .why{margin:10px 0 0;padding-left:18px;font-size:14px;color:var(--ink-2)}
+  .why li.bad{color:var(--coral);font-weight:700} .why li.warn{color:var(--amber);font-weight:700}
+  .foot{margin-top:20px;font-size:13px;color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>Program view</h1><p id="asof">Every site, today. Red flags first.</p></div>
+    <a href="./">← A nurse's floor</a>
+  </div>
+
+  <div class="program">
+    <h2>Across the program</h2>
+    <div class="kpis" id="pk"></div>
+    <div class="flags" id="pflags"></div>
+  </div>
+
+  <div class="sites" id="sites"></div>
+
+  <p class="foot">The first site is live: it reads the floor on this device (med pass log, flags, med rec, handoff). The other sites are made-up sample numbers to show the shape of the view; nothing here is a real IHH site. Thresholds are ours and should be set by IHH: red if med pass completion is under 85% or 3+ doses missed vs. orders or a handoff was skipped; watch if under 95% or 1–2 doses missed or a doctor flag is open.</p>
+</div>
+
+<script>window.__CLIENTS__={
+  "about": "Made-up clients for the Rounds prototype. No real person. Names are placeholders and are stripped before anything leaves the browser. Pass times, med names and appointments are made up for the med-pass board.",
+  "clients": [
+    {
+      "id": "robert",
+      "display": "Robert · Room 4",
+      "names": [
+        "Robert",
+        "Rob"
+      ],
+      "summary": "58, admitted after a hospital stay for a leg wound. Type 2 diabetes on oral medication. Walks with a cane.",
+      "goals": [
+        {
+          "id": "G1",
+          "text": "Checks blood sugar before meals and records it in the log independently"
+        },
+        {
+          "id": "G2",
+          "text": "Keeps left lower leg wound clean and dry; dressing changes per home health schedule"
+        },
+        {
+          "id": "G3",
+          "text": "Takes own medications on schedule without prompting"
+        }
+      ],
+      "sample_jottings": "rm4 BS 142 before lunch, took own metformin, watched him do it\nL leg dressing dry + intact, says HH came yesterday\nasked how to write down readings, showed him the log sheet, he did one entry himself\nsays knee hurts when walking, didn't want tylenol\ncall HH to confirm next dressing change day",
+      "passes": [
+        "8am",
+        "12pm",
+        "5pm",
+        "9pm"
+      ],
+      "meds": [
+        "metformin",
+        "lisinopril"
+      ],
+      "vitals_due": [
+        "blood sugar before meals",
+        "blood pressure"
+      ],
+      "appointments": [
+        {
+          "when": "Fri",
+          "what": "wound clinic"
+        }
+      ],
+      "mrn": "R-0004"
+    },
+    {
+      "id": "dolores",
+      "display": "Dolores · Room 7",
+      "names": [
+        "Dolores",
+        "Dee"
+      ],
+      "summary": "66, admitted after a hospital stay for high blood pressure. Uses a walker. Prefers Spanish.",
+      "goals": [
+        {
+          "id": "G1",
+          "text": "Takes blood pressure medication as scheduled, self-administered"
+        },
+        {
+          "id": "G2",
+          "text": "Walks 100 feet with walker twice a day"
+        },
+        {
+          "id": "G3",
+          "text": "Attends primary care follow-up appointment"
+        }
+      ],
+      "sample_jottings": "rm7 BP 138/84 HR 76 at 9am\ntook own lisinopril, had it in her pill box already\nwalked to the dining room and back w walker, ~120ft, one rest\nsays dizzy when she stands up fast, told her to sit on edge of bed first\nstill needs ride set up for clinic appt thurs, told CM",
+      "passes": [
+        "8am",
+        "12pm",
+        "5pm",
+        "9pm"
+      ],
+      "meds": [
+        "lisinopril",
+        "amlodipine"
+      ],
+      "vitals_due": [
+        "blood pressure"
+      ],
+      "appointments": [
+        {
+          "when": "Thu",
+          "what": "primary care"
+        }
+      ],
+      "mrn": "R-0007"
+    },
+    {
+      "id": "marcus",
+      "display": "Marcus · Room 2",
+      "names": [
+        "Marcus",
+        "Marc"
+      ],
+      "summary": "34, admitted after a hospital stay for a skin infection on the right arm. On oral antibiotics.",
+      "goals": [
+        {
+          "id": "G1",
+          "text": "Completes oral antibiotic course independently"
+        },
+        {
+          "id": "G2",
+          "text": "Right arm redness and swelling decrease; reports any fever or spreading"
+        },
+        {
+          "id": "G3",
+          "text": "Attends wound check appointment"
+        }
+      ],
+      "sample_jottings": "rm2 temp 98.4\ntook AM antibiotic himself, 4 pills left in the pack\nR arm redness looks smaller than yesterday, marked edge w pen again, no drainage\nhe says it itches, told him not to scratch and to tell us if it gets hot or red past the line\nasked about job stuff, told him CM can help",
+      "passes": [
+        "8am",
+        "5pm"
+      ],
+      "meds": [
+        "cephalexin"
+      ],
+      "vitals_due": [
+        "temp"
+      ],
+      "appointments": [
+        {
+          "when": "Mon",
+          "what": "wound check"
+        }
+      ],
+      "mrn": "R-0002"
+    }
+  ]
+};</script>
+<script>
+(async function(){
+  if(!window.__CLIENTS__){ try{ window.__CLIENTS__=await (await fetch('/api/clients')).json(); }catch(e){ window.__CLIENTS__={clients:[]}; } }
+  const $=s=>document.querySelector(s); const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const today=new Date().toISOString().slice(0,10);
+  const store=k=>{try{const v=localStorage.getItem('rounds.'+k);return v?JSON.parse(v):null}catch(e){return null}};
+
+  // Sample sites. Sizes follow what IHH described (an 18-bed children's site, a 150-bed site); names are placeholders.
+  const SAMPLE=[
+    {name:'Site B · recuperative care',beds:150,census:138,staff:'5 LVN/MA days · 3 nights',hist:{missed:[2,1,3,2,4,5,6],completion:[94,96,93,95,91,89,86]},side:3,doctor:2,ready:7,notes:71,handoff:true,reauth:9},
+    {name:"Site C · children's & family",beds:18,census:14,staff:'1 LVN per shift',hist:{missed:[0,0,0,1,0,0,0],completion:[100,100,98,97,100,100,100]},side:0,doctor:0,ready:2,notes:100,handoff:true,reauth:1},
+    {name:'Site D · recuperative care',beds:64,census:60,staff:'2 LVN/MA days · 1 night',hist:{missed:[1,0,1,1,2,1,1],completion:[97,98,96,97,95,96,96]},side:1,doctor:1,ready:3,notes:88,handoff:false,reauth:4}
+  ];
+
+  // Live site from this device's Rounds data.
+  function liveSite(){
+    const clients=(window.__CLIENTS__&&window.__CLIENTS__.clients)||null;
+    const log=store('log.'+today)||{}, flags=store('flags.'+today)||{}, done=store('done')||{}, ho=store('handoff');
+    const PASS={'8am':7,'12pm':11,'5pm':16,'9pm':20}; const h=new Date().getHours();
+    let open=0,logged=0,missedPass=0,side=0,doctor=0,ready=0,noted=0,n=0;
+    (clients||[]).forEach(c=>{ n++; (c.passes||[]).filter(p=>h>=PASS[p]).forEach(p=>{ open++; const s=(log[c.id]||{})[p]; if(s) logged++; if(s==='missed') missedPass++; if(s==='side') side++; }); const f=flags[c.id]||{}; if(f.doctor) doctor++; if(f.ready) ready++; if(done[c.id]) noted++; });
+    const completion=open?Math.round(100*logged/open):100;
+    const rec=store('medrec.'+today); // written by the floor when med rec runs
+    const missed=(rec&&rec.missedDoses)||missedPass;
+    return {name:'Site A · this device',beds:12,census:n,staff:'demo floor',live:true,hist:{missed:[1,2,1,0,2,1,missed],completion:[96,93,97,100,92,95,completion]},side,doctor,ready,notes:n?Math.round(100*noted/n):0,handoff:!!(ho&&ho.clients),reauth:1,openPasses:open,logged};
+  }
+
+  function verdict(s){
+    const m=s.hist.missed.at(-1), c=s.hist.completion.at(-1); const why=[];
+    if(c<85) why.push({l:'bad',t:`Med pass completion ${c}%`}); else if(c<95) why.push({l:'warn',t:`Med pass completion ${c}%`});
+    if(m>=3) why.push({l:'bad',t:`${m} doses missed vs. orders today`}); else if(m>=1) why.push({l:'warn',t:`${m} dose${m>1?'s':''} missed vs. orders today`});
+    if(!s.handoff) why.push({l:'bad',t:'No shift handoff recorded'});
+    if(s.doctor) why.push({l:'warn',t:`${s.doctor} client${s.doctor>1?'s':''} flagged for a doctor`});
+    if(s.side) why.push({l:'warn',t:`${s.side} side effect${s.side>1?'s':''} reported`});
+    if(s.reauth>=5) why.push({l:'warn',t:`${s.reauth} reauthorizations due this week`});
+    const level=why.some(w=>w.l==='bad')?'red':why.length?'watch':'steady';
+    return {level,why,label:level==='red'?'Red flag':level==='watch'?'Watch':'Steady'};
+  }
+
+  const sites=[liveSite(),...SAMPLE].map(s=>Object.assign(s,{v:verdict(s)}));
+  // program KPIs
+  const tot={census:sites.reduce((a,s)=>a+s.census,0),beds:sites.reduce((a,s)=>a+s.beds,0),missed:sites.reduce((a,s)=>a+s.hist.missed.at(-1),0),red:sites.filter(s=>s.v.level==='red').length,doctor:sites.reduce((a,s)=>a+s.doctor,0),ready:sites.reduce((a,s)=>a+s.ready,0),reauth:sites.reduce((a,s)=>a+s.reauth,0)};
+  $('#asof').textContent=`${sites.length} sites · ${new Date().toLocaleDateString([], {weekday:'long',month:'short',day:'numeric'})} · red flags first.`;
+  $('#pk').innerHTML=`<div class="kpi ${tot.red?'bad':'good'}"><b>${tot.red}</b><span>site${tot.red===1?'':'s'} with a red flag</span></div><div class="kpi ${tot.missed>=3?'bad':tot.missed?'warn':'good'}"><b>${tot.missed}</b><span>doses missed vs. orders today</span></div><div class="kpi ${tot.doctor?'warn':'good'}"><b>${tot.doctor}</b><span>flagged for a doctor</span></div><div class="kpi"><b>${tot.ready}</b><span>ready to move out</span></div><div class="kpi"><b>${tot.census}<span style="font-size:14px;color:var(--ink-2)">/${tot.beds}</span></b><span>beds in use</span></div>`;
+  const allFlags=sites.flatMap(s=>s.v.why.map(w=>({site:s.name,...w}))).sort((a,b)=>(a.l==='bad'?0:1)-(b.l==='bad'?0:1));
+  $('#pflags').innerHTML=allFlags.length?allFlags.map(f=>`<div class="flag ${f.l==='bad'?'':'warn'}"><i></i><div><b>${esc(f.t)}</b><span>${esc(f.site)}</span></div></div>`).join(''):`<div class="flag" style="background:var(--sage-2)"><i style="background:var(--sage)"></i><div><b>Nothing flagged across the program.</b></div></div>`;
+
+  const order={red:0,watch:1,steady:2};
+  $('#sites').innerHTML=sites.sort((a,b)=>order[a.v.level]-order[b.v.level]).map(s=>{
+    const c=s.hist.completion.at(-1), m=s.hist.missed.at(-1);
+    const bars=(arr,bad,warn,invert)=>arr.map((v,i)=>{const lvl=invert?(v<bad?'bad':v<warn?'warn':'ok'):(v>=bad?'bad':v>=warn?'warn':'ok'); const max=Math.max(...arr,1); const hgt=invert?Math.max(8,Math.round(100*(v-Math.min(...arr)+5)/(max-Math.min(...arr)+5))):Math.max(8,Math.round(100*v/max)); return `<i class="${lvl} ${i===arr.length-1?'today':''}" style="height:${v===0&&!invert?8:hgt}%" title="${v}"></i>`;}).join('');
+    return `<div class="site ${s.v.level}"><div class="hd"><h3>${esc(s.name)}</h3>${s.live?'<span class="live">live from this device</span>':''}<span class="verdict">${s.v.label}</span></div>
+      <div class="sub">${s.census} of ${s.beds} beds · ${esc(s.staff)}${s.live&&s.openPasses!=null?` · ${s.logged}/${s.openPasses} passes logged so far`:''}</div>
+      <div class="grid"><div class="m ${c<85?'bad':c<95?'warn':'good'}"><b>${c}%</b><span>med pass done</span></div><div class="m ${m>=3?'bad':m?'warn':'good'}"><b>${m}</b><span>missed vs. orders</span></div><div class="m ${s.doctor?'warn':''}"><b>${s.doctor}</b><span>doctor flags</span></div><div class="m"><b>${s.ready}</b><span>ready soon</span></div>
+        <div class="m ${s.side?'warn':''}"><b>${s.side}</b><span>side effects</span></div><div class="m ${s.notes<80?'warn':''}"><b>${s.notes}%</b><span>notes done</span></div><div class="m ${s.handoff?'good':'bad'}"><b>${s.handoff?'✓':'—'}</b><span>handoff</span></div><div class="m ${s.reauth>=5?'warn':''}"><b>${s.reauth}</b><span>reauths due</span></div></div>
+      <div class="trend"><div class="lbl">Missed vs. orders, last 7 days</div><div class="bars">${bars(s.hist.missed,3,1,false)}</div></div>
+      <div class="trend"><div class="lbl">Med pass completion, last 7 days</div><div class="bars">${bars(s.hist.completion,85,95,true)}</div></div>
+      ${s.v.why.length?`<ul class="why">${s.v.why.map(w=>`<li class="${w.l}">${esc(w.t)}</li>`).join('')}</ul>`:'<p class="why" style="list-style:none;padding:0">Nothing to chase here today.</p>'}
+    </div>`; }).join('');
+})();
+</script>
+</body>
+</html>

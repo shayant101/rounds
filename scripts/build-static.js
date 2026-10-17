@@ -42,4 +42,7 @@ let out = html
   .replace(/<link rel="apple-touch-icon" href="icon.svg">/, '');
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 fs.writeFileSync(path.join(root, 'dist', 'index.html'), out);
+const prog = fs.readFileSync(path.join(root, 'public', 'program.html'), 'utf8').replace('window.__CLIENTS__=null;/*CLIENTS*/', () => `window.__CLIENTS__=${clients};`).replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);
+fs.writeFileSync(path.join(root, 'dist', 'program.html'), prog);
+console.log('wrote dist/program.html');
 console.log('wrote dist/index.html', (out.length / 1024).toFixed(0) + ' KB');

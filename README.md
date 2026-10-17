@@ -33,6 +33,10 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 - **Hand off:** at the end of the shift, "Prepare handoff" writes the handoff from the day (missed and unlogged passes, side effects, med rec gaps, doctor / ready flags, unconfirmed appointments), she adds what only she knows per client and for the floor, then "Hand off." The next person opens Rounds and sees it at the top of their floor, item by item, ticking each one as read. Copy and print for the paper people.
 - **Send:** *Message the team* drafts the shift update ("Ready to move out soon: …, A doctor should look at: …, Missed a med pass: …"). *What's still missing* builds the list a reviewer would build later, now. Both copy to the clipboard; Rounds sends nothing.
 
+**Program view (for IHH staff)** — `program.html`, linked from the floor's footer. Every site as a card with a plain verdict (steady / watch / red flag) and the numbers behind it: med pass completion, doses missed vs. orders, doctor flags, ready to move out, side effects, notes done, handoff done, reauthorizations due, with 7-day bars for the two that matter most. Red flags across the program are listed first. The first site is live from this device's floor; the other three are made-up sample sites (sized like the ones IHH described: an 18-bed children's site, a 150-bed site). Thresholds are ours and should be set by IHH.
+
+![Program view](docs/screenshot-program.png)
+
 **Writing up a room**
 
 1. **The whiteboard.** Rooms across the top, like the unit board. Tap a room. The client's care plan goals show as chips.
