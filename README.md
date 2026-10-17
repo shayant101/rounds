@@ -82,6 +82,9 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 
 ## Try it
 
+**Hosted demo:** the landing page has two doors. Floor code `2468`, IHH staff code `1357`. These are demo placeholders; production sign-in would be IHH's own accounts (SSO). `vercel.json` is set so connecting this repo to Vercel deploys the static build (`/` landing, `/app/` floor, `/program/` program view).
+
+
 ```bash
 git clone <this repo>
 cd rounds

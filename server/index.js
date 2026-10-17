@@ -14,6 +14,10 @@ const mocks = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'moc
 
 const app = express();
 app.use(express.json({ limit: '64kb' }));
+app.get('/', (_req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'landing.html')));
+app.get(['/app/', '/app/index.html'], (_req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'index.html')));
+app.get(['/program/', '/program/index.html'], (_req, res) => res.sendFile(path.join(__dirname, '..', 'public', 'program.html')));
+app.use(['/app', '/program'], express.static(path.join(__dirname, '..', 'public')));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/data', express.static(path.join(__dirname, '..', 'data'), { index: false }));
 

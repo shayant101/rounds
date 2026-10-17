@@ -1,0 +1,1 @@
+{ "outputDirectory": "dist", "buildCommand": "node scripts/build-static.js", "installCommand": "npm install --omit=dev", "cleanUrls": true, "trailingSlash": true }

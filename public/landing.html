@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rounds</title>
+<meta name="description" content="The shift on one screen for recuperative care nurses. You tap. You sign.">
+<meta name="theme-color" content="#1F6F78">
+<link rel="icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--mist:#F3F6F5;--paper:#fff;--ink:#1C2A2A;--ink-2:#5B6B69;--rule:#DCE4E2;--teal:#1F6F78;--teal-2:#E3F0F1;--on-teal:#fff;--hl:#F8E16C;--hl-ink:#5C4A00;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--sage:#2E7D5B;--sage-2:#E4F2EA;--r:16px}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--mist:#141B1B;--paper:#1C2525;--ink:#EEF3F2;--ink-2:#A6B5B2;--rule:#2B3736;--teal:#5FC4CC;--teal-2:#173536;--on-teal:#0B1A1B;--hl:#E6CF4A;--hl-ink:#1C1700;--coral:#FF8F86;--coral-2:#3B1F1D;--sage:#7FD6A6;--sage-2:#173328}}
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  body{margin:0;background:var(--mist);color:var(--ink);font:500 17px/1.55 "Nunito",system-ui,sans-serif}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 16px 60px}
+  header{display:flex;align-items:center;gap:12px;padding:18px 0}
+  .logo{width:40px;height:40px;border-radius:12px;background:var(--teal);display:grid;place-items:center}
+  .logo svg{width:26px;height:26px}
+  header b{font-size:20px;font-weight:900}
+  header span{color:var(--ink-2);font-size:14px}
+  .hero{display:grid;gap:28px;padding:24px 0 10px}
+  @media(min-width:900px){.hero{grid-template-columns:1.1fr 1fr;align-items:center}}
+  h1{font-size:clamp(34px,6vw,54px);line-height:1.02;letter-spacing:-.02em;margin:0 0 14px;font-weight:900}
+  .lede{font-size:19px;color:var(--ink-2);margin:0 0 22px;max-width:36ch}
+  .doors{display:grid;gap:10px}
+  @media(min-width:560px){.doors{grid-template-columns:1fr 1fr}}
+  .door{background:var(--paper);border:3px solid var(--rule);border-radius:var(--r);padding:16px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;display:grid;gap:4px;min-height:0}
+  .door:hover,.door:focus-visible{border-color:var(--teal);outline:none}
+  .door b{font-size:19px;font-weight:900}
+  .door span{color:var(--ink-2);font-size:14px}
+  .door .go{color:var(--teal);font-weight:800;font-size:15px;margin-top:4px}
+  .mock{background:var(--paper);border-radius:20px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.10)}
+  .floor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .bed{border-radius:14px 14px 10px 10px;border:3px solid var(--rule);min-height:76px;padding:8px;position:relative;background:var(--mist);font-size:12px;color:var(--ink-2)}
+  .bed::before{content:"";position:absolute;left:10px;right:10px;top:6px;height:6px;border-radius:3px;background:var(--rule)}
+  .bed b{display:block;margin-top:12px;font-size:15px;color:var(--ink)}
+  .bed.due{border-color:var(--teal);background:var(--teal-2);animation:breathe 2.6s ease-in-out infinite}
+  .bed.ok{border-color:var(--sage);background:var(--sage-2)} .bed.miss{border-color:var(--coral);background:var(--coral-2)} .bed.open{border-style:dashed;background:transparent}
+  @keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(31,111,120,0)}50%{box-shadow:0 0 0 6px rgba(31,111,120,.18)}}
+  @media(prefers-reduced-motion:reduce){.bed.due{animation:none}}
+  .line{margin-top:10px;background:var(--teal);color:var(--on-teal);border-radius:12px;padding:10px 12px;font-weight:800;font-size:14px}
+  .strip{display:grid;gap:12px;margin:34px 0 10px}
+  @media(min-width:700px){.strip{grid-template-columns:repeat(3,1fr)}}
+  .card{background:var(--paper);border-radius:var(--r);padding:18px}
+  .card h3{margin:0 0 6px;font-size:18px;font-weight:900}
+  .card p{margin:0;color:var(--ink-2);font-size:15px}
+  .q{margin:40px 0 0;padding:22px 24px;border-left:6px solid var(--hl);background:var(--paper);border-radius:0 var(--r) var(--r) 0;font-size:18px}
+  .q small{display:block;color:var(--ink-2);margin-top:8px;font-size:14px}
+  .steps{margin:34px 0 0;display:grid;gap:10px}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+  .step i{width:44px;height:44px;border-radius:50%;background:var(--teal-2);color:var(--teal);display:grid;place-items:center;font-style:normal;font-weight:900}
+  .step b{display:block;font-size:17px} .step span{color:var(--ink-2);font-size:15px}
+  .trust{margin-top:34px;display:grid;gap:8px;font-size:15px;color:var(--ink-2)}
+  .trust li{list-style:none;padding-left:26px;position:relative} .trust li::before{content:"✓";position:absolute;left:0;color:var(--sage);font-weight:900}
+  .trust ul{margin:0;padding:0;display:grid;gap:6px}
+  footer{margin-top:40px;font-size:13px;color:var(--ink-2)} footer a{color:var(--teal)}
+  /* gate */
+  .gate{position:fixed;inset:0;background:rgba(20,27,27,.45);display:grid;place-items:center;padding:16px;z-index:30}
+  .gatebox{background:var(--paper);border-radius:var(--r);padding:22px;max-width:420px;width:100%;display:grid;gap:12px}
+  .gatebox h2{margin:0;font-size:22px;font-weight:900}
+  .gatebox p{margin:0;color:var(--ink-2);font-size:15px}
+  .gatebox input{height:52px;border:2px solid var(--rule);border-radius:12px;padding:0 14px;font:inherit;font-size:20px;letter-spacing:.2em;text-align:center;background:var(--mist);color:var(--ink)}
+  .gatebox .btns{display:flex;gap:8px}
+  .gatebox button{flex:1;min-height:50px;border:0;border-radius:12px;font:inherit;font-weight:900;cursor:pointer;background:var(--mist);color:var(--ink)}
+  .gatebox button.main{background:var(--teal);color:var(--on-teal)}
+  .gatebox .err{color:var(--coral);font-weight:800;font-size:14px;min-height:1.2em}
+  .gatebox .demo{font-size:13px;color:var(--ink-2);background:var(--mist);border-radius:10px;padding:8px 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="logo"><svg viewBox="0 0 64 64"><path d="M18 20h20M18 30h28M18 40h16" stroke="#fff" stroke-width="6" stroke-linecap="round"/><path d="M40 40l6 6 10-12" stroke="#F8E16C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div><div><b>Rounds</b><br><span>for recuperative care</span></div></header>
+
+  <section class="hero">
+    <div>
+      <h1>The shift on one screen.<br>You tap. You sign.</h1>
+      <p class="lede">Built with and for the LVNs and medical assistants at Illumination Health + Home. Med pass, med rec, handoff and notes, without typing into forms, and nothing that says something you didn't.</p>
+      <div class="doors">
+        <button class="door" data-role="floor"><b>I'm on the floor</b><span>LVN or medical assistant. Your beds, your med pass, your notes.</span><span class="go">Open my floor →</span></button>
+        <button class="door" data-role="program"><b>I'm IHH staff</b><span>Program and site leads. Every site at a glance, red flags first.</span><span class="go">Open program view →</span></button>
+      </div>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="floor">
+        <div class="bed open">Bed 1<b>open</b></div><div class="bed due">Bed 2<b>Marcus</b></div><div class="bed open">Bed 3<b>open</b></div>
+        <div class="bed ok">Bed 4<b>Robert</b></div><div class="bed open">Bed 5<b>open</b></div><div class="bed open">Bed 6<b>open</b></div>
+        <div class="bed miss">Bed 7<b>Dolores</b></div><div class="bed open">Bed 8<b>open</b></div><div class="bed open">Bed 9<b>open</b></div>
+      </div>
+      <div class="line">1 client hasn't come for the 12pm pass yet: Dolores.</div>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div class="card"><h3>Who needs you now</h3><p>Beds colored like a restaurant floor: teal breathes for an open med pass, coral for a miss, green for caught up. Tap a bed to work it.</p></div>
+    <div class="card"><h3>Ordered vs. taken</h3><p>Drop Kipu's two exports in. Rounds matches them and shows missed doses, refused doses, and meds with no order, before a payer does.</p></div>
+    <div class="card"><h3>Nothing you didn't say</h3><p>Notes are drafted from your own jottings. Touch any line and the jotting it came from lights up. Anything added gets caught in red.</p></div>
+  </section>
+
+  <blockquote class="q">"If they took it and you didn't document it, the insurance company isn't going to pay."<small>IHH staff, describing why every med pass log matters. Rounds makes the log the tap itself.</small></blockquote>
+
+  <section class="steps">
+    <div class="step"><i>1</i><div><b>Start your shift</b><span>Say your name. See the floor. The handoff from the last shift waits at the top until you've read it.</span></div></div>
+    <div class="step"><i>2</i><div><b>Work the beds</b><span>Med pass taps, vitals tiles, "they said," "I taught." Or say it: the mic understands "blood pressure 120 over 80 for Robert" and asks before it logs.</span></div></div>
+    <div class="step"><i>3</i><div><b>Sign and send</b><span>Your note in your words, copied into Kipu. A teach sheet for the client in English or Spanish. A handoff for the next shift.</span></div></div>
+  </section>
+
+  <section class="trust"><ul>
+    <li>Everything stays on the device. Rounds never writes to Kipu, CalOptima or any IHH system.</li>
+    <li>Names and ID numbers are removed in the browser before any text is sent for drafting.</li>
+    <li>Every drafted line is checked against your words by a deterministic checker, not by trusting the model.</li>
+    <li>Open source (MIT), built at the Orange County Claude Impact Lab, October 17, 2026, donated to IHH.</li>
+  </ul></section>
+
+  <footer>Demo with made-up clients and sites. Access codes below are for the demo only; production sign-in would use IHH's own accounts. <a href="https://github.com/shayant101/rounds">Source on GitHub</a></footer>
+</div>
+
+<div class="gate" id="gate" hidden>
+  <div class="gatebox" role="dialog" aria-labelledby="gTitle">
+    <h2 id="gTitle">Access code</h2>
+    <p id="gText">For the floor.</p>
+    <input type="text" id="gCode" inputmode="numeric" autocomplete="one-time-code" placeholder="••••" aria-label="access code">
+    <div class="err" id="gErr"></div>
+    <div class="btns"><button id="gCancel">Back</button><button class="main" id="gGo">Enter</button></div>
+    <div class="demo">Demo codes: floor <b>2468</b> · IHH staff <b>1357</b>. These are placeholders for a real sign-in.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const CODES={floor:'2468',program:'1357'}; const DEST={floor:'app/index.html',program:'program/index.html'};
+  let role=null; const gate=document.getElementById('gate'), code=document.getElementById('gCode'), err=document.getElementById('gErr');
+  const ok=r=>{ try{ return localStorage.getItem('rounds.access.'+r)==='1'; }catch(e){ return false; } };
+  document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{ role=b.dataset.role; if(ok(role)){ location.href=DEST[role]; return; } document.getElementById('gText').textContent=role==='floor'?'For LVNs and medical assistants.':'For IHH program and site staff.'; code.value=''; err.textContent=''; gate.hidden=false; code.focus(); });
+  document.getElementById('gCancel').onclick=()=>{ gate.hidden=true; };
+  const go=()=>{ if(code.value.trim()===CODES[role]){ try{ localStorage.setItem('rounds.access.'+role,'1'); }catch(e){} location.href=DEST[role]; } else { err.textContent='That code didn\'t match.'; code.select(); } };
+  document.getElementById('gGo').onclick=go; code.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); if(e.key==='Escape') gate.hidden=true; });
+})();
+</script>
+</body>
+</html>

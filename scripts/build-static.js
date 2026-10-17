@@ -40,9 +40,11 @@ let out = html
   .replace('<link rel="manifest" href="manifest.json">', '')
   .replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`)
   .replace(/<link rel="apple-touch-icon" href="icon.svg">/, '');
-fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
-fs.writeFileSync(path.join(root, 'dist', 'index.html'), out);
+fs.mkdirSync(path.join(root, 'dist', 'app'), { recursive: true }); fs.mkdirSync(path.join(root, 'dist', 'program'), { recursive: true });
+
+fs.writeFileSync(path.join(root, 'dist', 'app', 'index.html'), out);
+const landing = fs.readFileSync(path.join(root, 'public', 'landing.html'), 'utf8').replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);
+fs.writeFileSync(path.join(root, 'dist', 'index.html'), landing);
 const prog = fs.readFileSync(path.join(root, 'public', 'program.html'), 'utf8').replace('window.__CLIENTS__=null;/*CLIENTS*/', () => `window.__CLIENTS__=${clients};`).replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);
-fs.writeFileSync(path.join(root, 'dist', 'program.html'), prog);
-console.log('wrote dist/program.html');
-console.log('wrote dist/index.html', (out.length / 1024).toFixed(0) + ' KB');
+fs.writeFileSync(path.join(root, 'dist', 'program', 'index.html'), prog);
+console.log('wrote dist/index.html (landing), dist/app/, dist/program/');
