@@ -124,26 +124,11 @@
   <footer>Demo · made-up clients · <a href="views/index.html">Laptop, tablet, phone</a> · <a href="https://github.com/shayant101/rounds">Source</a></footer>
 </div>
 
-<div class="gate" id="gate" hidden>
-  <div class="gatebox" role="dialog" aria-labelledby="gTitle">
-    <h2 id="gTitle">Access code</h2>
-    <p id="gText"></p>
-    <input type="text" id="gCode" inputmode="numeric" autocomplete="one-time-code" placeholder="••••" aria-label="access code">
-    <div class="err" id="gErr"></div>
-    <div class="btns"><button id="gCancel">Back</button><button class="main" id="gGo">Enter</button></div>
-    <div class="demo">Demo codes · floor <b>2468</b> · IHH staff <b>1357</b></div>
-  </div>
-</div>
 
 <script>
 (function(){
-  const CODES={floor:'2468',program:'1357'}; const DEST={floor:'app/index.html',program:'program/index.html'};
-  let role=null; const gate=document.getElementById('gate'), code=document.getElementById('gCode'), err=document.getElementById('gErr');
-  const ok=r=>{ try{ return localStorage.getItem('rounds.access.'+r)==='1'; }catch(e){ return false; } };
-  document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{ role=b.dataset.role; if(ok(role)){ location.href=DEST[role]; return; } document.getElementById('gText').textContent=role==='floor'?'Floor':'IHH staff'; code.value=''; err.textContent=''; gate.hidden=false; code.focus(); });
-  document.getElementById('gCancel').onclick=()=>{ gate.hidden=true; };
-  const go=()=>{ if(code.value.trim()===CODES[role]){ try{ localStorage.setItem('rounds.access.'+role,'1'); }catch(e){} location.href=DEST[role]; } else { err.textContent='That code didn\'t match.'; code.select(); } };
-  document.getElementById('gGo').onclick=go; code.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); if(e.key==='Escape') gate.hidden=true; });
+  const DEST={floor:'app/index.html',program:'program/index.html'};
+  document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{ location.href=DEST[b.dataset.role]; });
 })();
 </script>
 <script>(function(){var b=document.getElementById("themeBtn");if(!b)return;b.onclick=function(){var cur=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",cur);try{localStorage.setItem("rounds.theme",cur);}catch(e){}};})();</script>
