@@ -68,6 +68,8 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 - **The payers:** IHH named Kaiser, L.A. Care, Blue Shield, Molina and CalOptima. We verified one in detail.
 - **CalOptima Health (Medi-Cal clients):** verified from CalOptima's Community Supports Provider Program Guide (Jan 2026): recuperative care is auto-authorized for 30 days; days 31–60 and 61–90 need a reauthorization in **CalOptima Health Connect** with the **care plan, including discharge planning notes**, uploaded. The care plan form (Appendix I) has the boxes our sections map to: Vital Signs; Care Preferences and Concerns Voiced by Member; Health Education/Interventions Provided; Interventions with status; Member Appointments. Phase 2 of Rounds assembles the signed notes into that field order at day 25/55/85 for whoever uploads. The nurse never touches Health Connect.
 
+**Live:** https://rounds-shayans-projects-401c4a5f.vercel.app (floor code `2468`, IHH staff code `1357`)
+
 **Demo video:** [link]
 
 ![Draft view](docs/screenshot-draft.png)
@@ -82,7 +84,7 @@ Rounds is her shift on one screen. No install (add to home screen), no login, no
 
 ## Try it
 
-**Hosted demo:** the landing page has two doors. Floor code `2468`, IHH staff code `1357`. These are demo placeholders; production sign-in would be IHH's own accounts (SSO). `vercel.json` is set so connecting this repo to Vercel deploys the static build (`/` landing, `/app/` floor, `/program/` program view).
+**Hosted demo:** https://rounds-shayans-projects-401c4a5f.vercel.app — the landing page has two doors. Floor code `2468`, IHH staff code `1357`. These are demo placeholders; production sign-in would be IHH's own accounts (SSO). `vercel.json` is set so connecting this repo to Vercel deploys the static build (`/` landing, `/app/` floor, `/program/` program view).
 
 
 ```bash
