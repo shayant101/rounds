@@ -7,8 +7,10 @@
   :root[data-theme="light"]{--bg:#F6F8F4;--ink:#0B0D0B;--ink-2:#5B655A;--rule:#DCE3D9}
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:700 16px/1.4 "Nunito",system-ui,sans-serif}
   .wrap{max-width:1500px;margin:0 auto;padding:16px}
-  .top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
   h1{font-size:26px;margin:0;font-weight:900} .top a{color:var(--teal);text-decoration:none;font-weight:900}
+.home{display:inline-flex} .mark{width:40px;height:40px;object-fit:contain} .light-only{display:none} .dark-only{display:block} :root[data-theme="light"] .light-only{display:block} :root[data-theme="light"] .dark-only{display:none}
+  .top .open{background:var(--teal);color:#0B0D0B;border-radius:999px;padding:8px 14px;min-height:44px;display:inline-flex;align-items:center}
   .seg{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
   .seg button{font:inherit;color:var(--ink);background:transparent;border:2px solid var(--rule);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:44px}
   .seg button[aria-pressed="true"]{border-color:var(--teal);color:var(--teal)}
@@ -26,7 +28,7 @@
   .note{color:var(--ink-2);font-size:14px;margin-top:18px;font-weight:700}
 </style></head>
 <body><div class="wrap">
-  <div class="top"><h1>Three screens</h1><a href="./">← Back</a>
+  <div class="top"><a class="home" href="../" title="Back to start"><img class="mark light-only" src="../brand/mark-black.png" alt="rounds"><img class="mark dark-only" src="../brand/mark-grey.png" alt="rounds"></a><h1>Three screens</h1><a href="../">← Back to start</a><a class="open" href="../app/">Open the app →</a>
     <div class="seg" id="seg"><button data-p="app/" aria-pressed="true">Floor</button><button data-p="program/">Program view</button></div></div>
   <div class="stage">
     <div class="dev laptop"><h2>Laptop</h2><div class="frame" id="f1"></div><div class="base"></div></div>

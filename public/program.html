@@ -13,6 +13,8 @@
 <style>
   :root{--mist:#0B0D0B;--paper:#151815;--ink:#F2F5F0;--ink-2:#A6AEA2;--rule:#2A2F29;--teal:#81E40A;--teal-2:#1A2B0E;--on-teal:#0B0D0B;--hl:#81E40A;--coral:#FF6B5E;--coral-2:#3A1C19;--amber:#F2B84B;--amber-2:#3A2E12;--sage:#D6DBD2;--sage-2:#222722;--r:14px;--r-sm:10px}
   :root[data-theme="light"]{--mist:#F6F8F4;--paper:#FFFFFF;--ink:#0B0D0B;--ink-2:#5B655A;--rule:#DCE3D9;--teal:#5FAE00;--teal-2:#EAF8DA;--on-teal:#0B0D0B;--hl:#81E40A;--hl-ink:#0B0D0B;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--amber-2:#FBF1DC;--sage:#4B554A;--sage-2:#ECEFEA}
+  .pmark{width:34px;height:34px;object-fit:contain;margin-top:4px}
+  :root[data-theme="light"] .pmark{content:url(brand/mark-black.png)}
   :root[data-theme="light"] .insight,:root[data-theme="light"] .go,:root[data-theme="light"] .btn.main,:root[data-theme="light"] .add,:root[data-theme="light"] .mic,:root[data-theme="light"] .gatebox button.main,:root[data-theme="light"] .logo{background:#81E40A;color:#0B0D0B}
   .themeBtn{min-height:40px;height:40px;width:40px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);display:grid;place-items:center;color:var(--ink);cursor:pointer;padding:0}
   .themeBtn svg{width:20px;height:20px}
@@ -80,8 +82,8 @@
 <body>
 <div class="wrap">
   <div class="top">
-    <div><h1>Program view</h1><p id="asof">Every site, today. Red flags first.</p></div>
-    <span style="display:flex;gap:10px;align-items:center"><a href="../app/index.html">← A nurse's floor</a><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span>
+    <div style="display:flex;gap:12px;align-items:flex-start"><a href="../" title="Back to start" style="display:inline-flex"><img src="brand/mark-grey.png" alt="rounds" class="pmark"></a><div><h1>Program view</h1><p id="asof">Every site, today. Red flags first.</p></div></div>
+    <span style="display:flex;gap:10px;align-items:center"><a href="../">Start</a><a href="../app/index.html">← A nurse's floor</a><button class="themeBtn" id="themeBtn" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></span>
   </div>
 
   <div class="program">
