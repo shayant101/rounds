@@ -236,15 +236,25 @@
   .mic{position:fixed;right:18px;bottom:18px;width:60px;height:60px;border-radius:50%;background:var(--teal);color:var(--on-teal);display:grid;place-items:center;box-shadow:0 6px 24px rgba(129,228,10,.25);z-index:20;min-height:0}
   .mic svg{width:28px;height:28px}
   .mic.on{animation:breathe 1.4s ease-in-out infinite;background:var(--coral)}
-  .voice{position:fixed;left:12px;right:12px;bottom:90px;max-width:520px;margin:0 auto;background:var(--paper);border-radius:var(--r);box-shadow:0 10px 30px rgba(0,0,0,.6);padding:14px;z-index:21;display:grid;gap:10px}
-  .vhd{display:flex;align-items:center;justify-content:space-between} .vhd b{font-size:17px}
-  .vheard{background:var(--mist);border-radius:var(--r-sm);padding:10px 12px;font-size:16px;min-height:44px}
+  .voice{position:fixed;inset:0;z-index:30;background:radial-gradient(120% 80% at 50% 110%,#13240a 0%,#0a0d0b 45%,#06080a 100%);color:#F2F5F0;display:grid;grid-template-rows:auto 1fr auto;padding:calc(14px + env(safe-area-inset-top)) 18px calc(14px + env(safe-area-inset-bottom));animation:vin .26s cubic-bezier(.2,.8,.2,1)}
+  @keyframes vin{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.voice{animation:none}}
+  .vhd{display:flex;align-items:center;justify-content:space-between;max-width:720px;width:100%;margin:0 auto} .vhd b{font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:#A6AEA2;font-weight:800}
+  .vhd .sm{background:rgba(255,255,255,.08);color:#F2F5F0;border:0;width:44px;height:44px;border-radius:50%;font-size:18px}
+  .vmid{display:grid;align-content:center;justify-items:center;gap:18px;max-width:720px;width:100%;margin:0 auto;text-align:center;z-index:1}
+  .vheard{font:600 clamp(22px,4.2vw,36px)/1.25 var(--note);color:#F2F5F0;min-height:1.3em;max-width:22ch;text-wrap:balance}
+  .vheard:not(.quote){font:500 17px/1.5 var(--ui);color:#A6AEA2;max-width:34ch}
   .vheard.quote{font-style:italic}
-  .vtype{display:flex;gap:6px} .vtype input{flex:1;height:44px;border:2px solid var(--rule);border-radius:var(--r-sm);padding:0 10px;background:var(--paper);font:inherit}
-  .plan{border:2px solid var(--teal);border-radius:var(--r);padding:12px;display:grid;gap:8px}
-  .plan .what{font-weight:800;font-size:17px}
-  .plan .who{color:var(--ink-2);font-size:14px}
-  .plan.unsure{border-color:var(--amber)}
+  .vwave{position:absolute;left:0;right:0;bottom:0;height:46vh;min-height:220px;width:100%;display:block;pointer-events:none}
+  .vbot{display:grid;gap:10px;max-width:560px;width:100%;margin:0 auto;z-index:1}
+  .vtype{display:flex;gap:6px} .vtype input{flex:1;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:0 16px;background:rgba(255,255,255,.08);color:#F2F5F0;font:inherit;backdrop-filter:blur(8px)} .vtype input::placeholder{color:#8f978c}
+  .vtype .sm{background:#81E40A;color:#0B0D0B;border:0;border-radius:999px;padding:0 18px;font-weight:900}
+  .plan{background:rgba(255,255,255,.08);backdrop-filter:blur(14px);border:1px solid rgba(129,228,10,.6);border-radius:var(--r);padding:14px;display:grid;gap:8px;color:#F2F5F0}
+  .plan .what{font-weight:800;font-size:18px}
+  .plan .who{color:#A6AEA2;font-size:14px}
+  .plan .btn{background:rgba(255,255,255,.1);color:#F2F5F0;border:0} .plan .btn.main{background:#81E40A;color:#0B0D0B}
+  .plan .muted{color:#8f978c}
+  .plan.unsure{border-color:#F2B84B}
   .plan .btns .btn{min-height:48px}
   button.sm{min-height:36px;padding:0 12px;border-radius:999px;background:var(--mist);font-weight:700;font-size:14px}
 
@@ -444,11 +454,11 @@
 <div class="devsw" id="devsw" hidden aria-label="Preview as"><button class="on" title="Desktop" aria-label="Desktop" data-d="laptop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 19h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><button title="Tablet" aria-label="Tablet" data-d="tablet"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></button><button title="Phone" aria-label="Phone" data-d="phone"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 5.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
 <script>(function(){var sw=document.getElementById('devsw');function show(){sw.hidden=!(window.top===window&&window.innerWidth>=980);}show();window.addEventListener('resize',show);sw.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){if(b.dataset.d==='laptop')return;location.href='../views/?d='+b.dataset.d+'&p=app/';};});})();</script>
 <button class="mic" id="micBtn" aria-label="Tell Rounds what to log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-<div class="voice" id="voice" hidden>
+<div class="voice" id="voice" hidden role="dialog" aria-label="Voice">
+  <canvas class="vwave" id="vWave" aria-hidden="true"></canvas>
   <div class="vhd"><b id="vTitle">Listening…</b><button class="sm" id="vClose" aria-label="close">✕</button></div>
-  <div class="vheard" id="vHeard">Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".</div>
-  <div class="vtype"><input type="text" id="vText" placeholder="…or type it here"><button class="sm" id="vGo">Go</button></div>
-  <div id="vPlan"></div>
+  <div class="vmid"><div class="vheard" id="vHeard">Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".</div><div id="vPlan" style="width:100%;max-width:520px;text-align:left"></div></div>
+  <div class="vbot"><div class="vtype"><input type="text" id="vText" placeholder="…or type it here"><button class="sm" id="vGo">Go</button></div></div>
 </div>
 <div id="printArea" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -758,6 +768,26 @@
     if(p.kind==='pass'){ const cur=latestOpen(); S.log[p.c.id]=S.log[p.c.id]||{}; S.log[p.c.id][cur]=p.status; if(p.note) S.log[p.c.id][cur+':note']=p.note; store.set('log.'+today,S.log); toast(`${p.c.display.split(' · ')[0]}: ${cur} pass logged`); if($('#home').hidden===false) renderHome(); return; }
     if(p.kind==='line'){ if(!S.client||S.client.id!==p.c.id) pick(p.c); S.lines.push({t:p.text,icon:iconOf(p.text)}); renderLines(); if(p.vitals){ S.flags[p.c.id]=S.flags[p.c.id]||{}; S.flags[p.c.id].vitals=true; store.set('flags.'+today,S.flags); } toast('Added to '+p.c.display.split(' · ')[0]+"'s sheet"); return; }
   }
+
+  // ---- voice wave: four layered sines in brand colours, amplitude from the live mic level (idle breathing when quiet)
+  const wave=(()=>{ const cv=$('#vWave'); let ctx=null, raf=0, t=0, level=0, target=0, ac=null, an=null, stream=null, buf=null;
+    const COLS=['#81E40A','#3BE0C4','#7C6BFF','#FF5FA2'];
+    function size(){ const r=window.devicePixelRatio||1; cv.width=cv.clientWidth*r; cv.height=cv.clientHeight*r; }
+    function draw(){ if(!ctx) return; const W=cv.width,H=cv.height,r=window.devicePixelRatio||1; ctx.clearRect(0,0,W,H);
+      if(an&&buf){ an.getByteTimeDomainData(buf); let s=0; for(let i=0;i<buf.length;i++){const v=(buf[i]-128)/128; s+=v*v;} target=Math.min(1,Math.sqrt(s/buf.length)*4); }
+      else target=0.08+0.05*Math.sin(t*0.9);
+      level+= (target-level)*0.12; t+=0.035;
+      const base=H*0.68, amp=H*(0.06+0.36*level);
+      ctx.globalCompositeOperation='screen';
+      COLS.forEach((c,i)=>{ const ph=t*(1+i*0.23)+i*1.7, f=(1.6+i*0.5)/W*Math.PI*2; ctx.beginPath();
+        for(let x=0;x<=W;x+=4*r){ const env=Math.sin(Math.PI*x/W); const y=base+Math.sin(x*f+ph)*amp*env*(1-i*0.12)+Math.sin(x*f*0.5-ph*0.7)*amp*0.35*env; if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+        ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); const g=ctx.createLinearGradient(0,base-amp,0,H); g.addColorStop(0,c+'55'); g.addColorStop(0.55,c+'12'); g.addColorStop(1,c+'00'); ctx.fillStyle=g; ctx.fill();
+        ctx.beginPath(); for(let x=0;x<=W;x+=4*r){ const env=Math.sin(Math.PI*x/W); const y=base+Math.sin(x*f+ph)*amp*env*(1-i*0.12)+Math.sin(x*f*0.5-ph*0.7)*amp*0.35*env; if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+        ctx.strokeStyle=c; ctx.lineWidth=2.2*r; ctx.shadowColor=c; ctx.shadowBlur=14*r; ctx.stroke(); ctx.shadowBlur=0; });
+      ctx.globalCompositeOperation='source-over'; raf=requestAnimationFrame(draw); }
+    async function listenAudio(){ try{ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return; stream=await navigator.mediaDevices.getUserMedia({audio:true}); ac=new (window.AudioContext||window.webkitAudioContext)(); an=ac.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6; buf=new Uint8Array(an.fftSize); ac.createMediaStreamSource(stream).connect(an); }catch(e){ an=null; } }
+    return { start(){ if(!cv) return; ctx=cv.getContext('2d'); size(); window.addEventListener('resize',size); cancelAnimationFrame(raf); if(matchMedia('(prefers-reduced-motion: reduce)').matches){ level=0.15; draw(); cancelAnimationFrame(raf); return; } draw(); listenAudio(); },
+      stop(){ cancelAnimationFrame(raf); window.removeEventListener('resize',size); if(stream){ stream.getTracks().forEach(tr=>tr.stop()); stream=null; } if(ac){ try{ac.close();}catch(e){} ac=null; } an=null; if(ctx) ctx.clearRect(0,0,cv.width,cv.height); } }; })();
   function startListen(){
     if(!SR){ vTitle.textContent='Type what you\'d say'; vHeard.textContent='This browser has no speech recognition. Typing works the same way.'; $('#vText').focus(); return; }
     try{ rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=1;
@@ -769,8 +799,8 @@
     }catch(e){ vTitle.textContent='Type what you\'d say'; }
   }
   function stopListen(){ listening=false; $('#micBtn').classList.remove('on'); }
-  function closeVoice(){ vBox.hidden=true; if(rec){ try{rec.stop();}catch(e){} } stopListen(); }
-  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } vBox.hidden=false; vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".'; $('#vText').value=''; startListen(); };
+  function closeVoice(){ vBox.hidden=true; wave.stop(); if(rec){ try{rec.stop();}catch(e){} } stopListen(); }
+  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } vBox.hidden=false; wave.start(); vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".'; $('#vText').value=''; startListen(); };
   $('#vClose').onclick=closeVoice;
   const typed=()=>{ const t=$('#vText').value.trim(); if(!t) return; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); showPlan(parse(t)); };
   $('#vGo').onclick=typed; $('#vText').addEventListener('keydown',e=>{ if(e.key==='Enter') typed(); });
