@@ -6,6 +6,7 @@
 <title>Rounds</title>
 <meta name="description" content="You jot. It drafts. You sign.">
 <meta name="theme-color" content="#0B0D0B">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Rounds">
 <link rel="manifest" href="manifest.json">
 <script>(function(){try{var t=localStorage.getItem("rounds.theme");if(!t)t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <link rel="icon" href="brand/favicon.png">
@@ -25,7 +26,7 @@
   }
   :root[data-theme="light"]{--mist:#F6F8F4;--paper:#FFFFFF;--ink:#0B0D0B;--ink-2:#5B655A;--rule:#DCE3D9;--teal:#5FAE00;--teal-2:#EAF8DA;--on-teal:#0B0D0B;--hl:#81E40A;--hl-ink:#0B0D0B;--coral:#C8463F;--coral-2:#FBEAE8;--amber:#B7791F;--amber-2:#FBF1DC;--sage:#4B554A;--sage-2:#ECEFEA}
   :root[data-theme="light"] .insight,:root[data-theme="light"] .go,:root[data-theme="light"] .btn.main,:root[data-theme="light"] .add,:root[data-theme="light"] .mic,:root[data-theme="light"] .gatebox button.main,:root[data-theme="light"] .logo{background:#81E40A;color:#0B0D0B}
-  .themeBtn{min-height:40px;height:40px;width:40px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);display:grid;place-items:center;color:var(--ink);cursor:pointer;padding:0}
+  .themeBtn{flex:none;min-height:40px;height:40px;width:40px;border-radius:50%;background:var(--paper);border:2px solid var(--rule);display:grid;place-items:center;color:var(--ink);cursor:pointer;padding:0}
   .themeBtn svg{width:20px;height:20px}
   *{box-sizing:border-box}
   [hidden]{display:none!important}
@@ -209,6 +210,25 @@
   .bar i{width:10px;height:10px;border-radius:3px;background:var(--sage)} .bar i.m{background:var(--coral)} .bar i.r{background:var(--amber)}
 
   /* voice */
+
+  /* phones + tablets: one job per screen, bottom tabs */
+  .tabbar{display:none}
+  @media(max-width:979px){
+    .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+    .top{padding-top:12px}
+    #home[data-tab="floor"] > [data-tab]:not([data-tab="floor"]),#home[data-tab="meds"] > [data-tab]:not([data-tab="meds"]),#home[data-tab="due"] > [data-tab]:not([data-tab="due"]),#home[data-tab="handoff"] > [data-tab]:not([data-tab="handoff"]){display:none}
+    .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:25;display:grid;grid-template-columns:repeat(4,1fr);background:var(--paper);border-top:1px solid var(--rule);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+    .tabbar button{position:relative;min-height:52px;background:transparent;border:0;border-radius:12px;color:var(--ink-2);font:800 12px/1 var(--ui);display:grid;justify-items:center;gap:4px;padding:6px 0}
+    .tabbar button svg{width:22px;height:22px;fill:currentColor}
+    .tabbar button[data-go=meds] svg,.tabbar button[data-go=due] svg,.tabbar button[data-go=handoff] svg{fill:none}
+    .tabbar button[aria-current="page"]{color:var(--ink);background:var(--mist)}
+    .tabbar .badge{position:absolute;top:4px;right:calc(50% - 24px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--teal);color:var(--on-teal);font:900 11px/18px var(--ui);text-align:center}
+    button.mic{bottom:calc(84px + env(safe-area-inset-bottom))}
+    .toast{bottom:calc(96px + env(safe-area-inset-bottom));max-width:calc(100vw - 32px);text-align:center}
+    #app:has(#home[hidden]) .tabbar{display:none}
+    body:has(#home[hidden]) button.mic{bottom:18px}
+  }
+  @media(pointer:coarse){.due .chip.small{min-height:40px;padding:4px 12px}.due .flagbtn{width:40px;min-height:40px}}
   .mic{position:fixed;right:18px;bottom:18px;width:60px;height:60px;border-radius:50%;background:var(--teal);color:var(--on-teal);display:grid;place-items:center;box-shadow:0 6px 24px rgba(129,228,10,.25);z-index:20;min-height:0}
   .mic svg{width:28px;height:28px}
   .mic.on{animation:breathe 1.4s ease-in-out infinite;background:var(--coral)}
@@ -336,8 +356,6 @@
     <div class="staff" id="staff"></div>
     <div class="row" style="align-items:center;justify-content:space-between"><span class="muted" style="font-size:13px">Demo staff. Real sign-in would be IHH's accounts.</span><button class="themeBtn" id="themeBtn2" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
   </div>
-    
-  </div>
 
   <div id="app" hidden>
     <div class="top">
@@ -349,20 +367,20 @@
     <section class="home" id="home">
       <div id="incoming"></div>
       <div class="insight" id="insight"></div>
-      <div class="panel floorpanel">
+      <div class="panel floorpanel" data-tab="floor">
         <div class="ph"><h2>The floor</h2><span class="muted">tap a bed</span></div>
         <div class="floor" id="floor"></div>
         <div class="legend">
           <span><i class="k due"></i>needs you now</span><span><i class="k ok"></i>caught up</span><span><i class="k miss"></i>missed a pass</span><span><i class="k flag"></i>flagged</span><span><i class="k open"></i>open bed</span>
         </div>
       </div>
-      <div class="panel">
+      <div class="panel" data-tab="meds">
         <div class="ph"><h2>Med pass</h2><span class="muted" id="passClock"></span></div>
         <div class="passgrid" id="passgrid"></div>
         <div id="passPick"></div>
         <div class="gofind" id="gofind"></div>
       </div>
-      <div class="panel" id="medrecPanel">
+      <div class="panel" id="medrecPanel" data-tab="meds">
         <div class="ph"><h2>Med rec</h2><span class="muted">ordered vs. taken, from Kipu's two exports</span></div>
         <p class="muted" style="margin:0 0 10px;font-size:14px">Kipu's two exports in. Missed doses out. Nothing leaves this device.</p>
         <div class="drops">
@@ -373,22 +391,22 @@
         <div id="recOpts"></div>
         <div id="recOut"></div>
       </div>
-      <div class="panel">
+      <div class="panel" data-tab="due">
         <div class="ph"><h2>Due today</h2><span class="muted">tap to tick off</span></div>
         <div class="due" id="due"></div>
       </div>
-      <div class="panel">
+      <div class="panel" data-tab="due">
         <div class="ph"><h2>Send</h2><span class="muted">drafts only, you send</span></div>
         <div class="btns"><button class="btn" id="teamBtn">Message the team</button><button class="btn" id="auditBtn">What's still missing</button></div>
         <pre class="draftbox" id="draftbox" hidden></pre>
       </div>
-      <div class="panel" id="handoffPanel">
+      <div class="panel" id="handoffPanel" data-tab="handoff">
         <div class="ph"><h2>Hand off</h2><span class="muted">for the next shift</span></div>
         <p class="muted" style="margin:0 0 10px;font-size:14px">Built from today. Add what only you know.</p>
         <div class="btns"><button class="btn main" id="prepHandoff">Prepare handoff</button></div>
         <div id="handoffOut"></div>
       </div>
-      <p class="muted" style="font-size:14px;margin:0">Tap a room above to write it up.</p>
+      <p class="muted" style="font-size:14px;margin:0" data-tab="floor">Tap a room above to write it up.</p>
     </section>
 
     <div class="cols" id="cols" hidden>
@@ -410,6 +428,12 @@
       </section>
     </div>
 
+    <nav class="tabbar" id="tabbar" aria-label="Sections">
+      <button data-go="floor" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="7" rx="2"/><rect x="13" y="4" width="8" height="7" rx="2"/><rect x="3" y="13" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2"/></svg><span>Floor</span></button>
+      <button data-go="meds"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l1 4H7zM6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM12 11v6M9 14h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span>Meds</span><i class="badge" id="badgeMeds" hidden></i></button>
+      <button data-go="due"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Due</span><i class="badge" id="badgeDue" hidden></i></button>
+      <button data-go="handoff"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h12M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Handoff</span></button>
+    </nav>
     <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="switchLink">Switch person</a> · <a href="#" id="resetLink">Reset demo</a></p>
   </div>
 </div>
@@ -488,6 +512,10 @@
   const isOpen=p=>new Date().getHours()>=PASS_START[p];
   const latestOpen=()=>allPasses().filter(isOpen).slice(-1)[0];
   const logOf=(c,p)=>(S.log[c.id]||{})[p];
+  S.tab=S.tab||'floor';
+  function setTab(t){ S.tab=t; $('#home').setAttribute('data-tab',t); document.querySelectorAll('.tabbar [data-go]').forEach(b=>{ if(b.dataset.go===t) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); }); window.scrollTo({top:0}); }
+  document.querySelectorAll('.tabbar [data-go]').forEach(b=>b.onclick=()=>setTab(b.dataset.go));
+  $('#home').setAttribute('data-tab','floor');
   function goHome(){ S.client=null; S.draft=null; S.selCell=null; $('#cols').hidden=true; $('#home').hidden=false; $('#board').hidden=true; renderBoard(); renderHome(); window.scrollTo({top:0}); }
 
   // the floor: one wing, beds in two rows of a dorm with an aisle. Made-up layout.
@@ -571,6 +599,10 @@
     d.querySelectorAll('[data-flagopen]').forEach(b=>b.onclick=()=>{ S.flagOpen=S.flagOpen===b.dataset.flagopen?null:b.dataset.flagopen; renderHome(); });
     d.querySelectorAll('[data-flag]').forEach(b=>b.onclick=()=>{ const c=b.dataset.c; S.flags[c]=S.flags[c]||{}; S.flags[c][b.dataset.flag]=!S.flags[c][b.dataset.flag]; if(b.dataset.flag==='doctor'||b.dataset.flag==='ready') S.flagOpen=null; store.set('flags.'+today,S.flags); renderHome(); });
     d.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pick(S.clients.find(c=>c.id===b.dataset.pick)));
+    // tab badges (phones/tablets)
+    const bm=$('#badgeMeds'), bd=$('#badgeDue');
+    if(bm){ const n=S.clients.filter(c=>(c.passes||[]).filter(isOpen).some(p=>!logOf(c,p))).length; bm.hidden=!n; bm.textContent=n; }
+    if(bd){ const n=S.clients.filter(c=>{ const f=S.flags[c.id]||{}; const open=(c.passes||[]).filter(isOpen); return !(open.length&&open.every(p=>logOf(c,p))&&f.vitals&&S.done[c.id]); }).length; bd.hidden=!n; bd.textContent=n; }
   }
   function draftText(kind){
     const nm=c=>c.display; const f=c=>S.flags[c.id]||{};
