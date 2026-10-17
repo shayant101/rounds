@@ -1,6 +1,6 @@
 # Rounds
 
-> For the LVN or medical assistant on a recuperative care floor: you jot during rounds, it drafts the progress note and a plain-language teach sheet, and every line points back to what you wrote. You sign.
+> The LVN or medical assistant's own whiteboard for the shift: who has come for med pass and who hasn't, what's due today, what's still missing, and a note for each room drafted from her own words. You tap. You sign.
 
 **Team:** Rounds
 **Members:** [names]
@@ -9,11 +9,22 @@
 
 ## The problem
 
-An LVN or MA at IHH sees 15 to 20 clients a shift: vitals, watching clients take their own medications, blood sugars, dressings, teaching. Every contact needs a note in Kipu, in a set format, tied to the client's care plan goals, and those notes are the evidence the health plan reads about every 30 days to decide whether the stay continues. Notes get written at the end of the shift from memory or paper. IHH already has an AI note tool inside Kipu and staff don't use it: it records audio in the room, it was built for hour-long therapy sessions, and the fears staff named are real: client information going somewhere it shouldn't, a note that says something that didn't happen, and being the first step to fewer staff.
+An LVN or MA at IHH's largest site covers up to 150 clients with four other staff. Clients live dorm-style and manage their own care; staff monitor, teach, coordinate and document. The day's core is med pass: clients come to the office at set times, staff watch them self-administer and log it. Anyone who doesn't show has to be found. Daily vitals, appointment coordination and a note per contact come on top, often written at the end of the shift from memory. The payers (Kaiser, L.A. Care, Blue Shield, Molina, CalOptima) key on exactly these records: every med administration, the goals, and what was done. A missed log can mean a missed payment. Today, finding what was missed means reading back through everything by hand. IHH has no AI in staff hands yet; staff fear it will replace them and have no room to learn it.
 
 ## What we built
 
-Rounds is the nurse's pocket "brain sheet," on a phone. No install (add to home screen), no login, no microphone, no connection to Kipu. The word "AI" appears nowhere in it.
+Rounds is her shift on one screen. No install (add to home screen), no login, no microphone, no connection to Kipu. The word "AI" appears nowhere in it. Documentation is the byproduct of doing the work in it, not a separate task.
+
+![My shift](docs/screenshot-shift.png)
+
+**My shift**
+- **One line that matters now:** "2 clients haven't come for the 12pm pass yet: Robert, Dolores."
+- **Med pass board:** rooms by pass times. Tap a cell: *Took it, I watched* / *Didn't come* / *Side effect*. That tap is the med log.
+- **Go find:** who to chase for the open pass, and who missed earlier.
+- **Due today:** per room, meds done out of open passes, vitals, note, appointment; plus two flags that are hers: *doctor should look* and *ready soon*.
+- **Send:** *Message the team* drafts the shift update ("Ready to move out soon: …, A doctor should look at: …, Missed a med pass: …"). *What's still missing* builds the list a reviewer would build later, now. Both copy to the clipboard; Rounds sends nothing.
+
+**Writing up a room**
 
 1. **The whiteboard.** Rooms across the top, like the unit board. Tap a room. The client's care plan goals show as chips.
 2. **Tap, don't type.** Nine tiles: blood sugar, blood pressure, temp, watched meds, dressing, walked, they said, I taught, next. A tile asks only for the number or a few words, with one-tap context ("before lunch", "with walker"). Each tap becomes a line on the sheet, with an icon. Free text is still there for anything else.
@@ -37,7 +48,8 @@ Rounds is the nurse's pocket "brain sheet," on a phone. No install (add to home 
 ### The path to the systems IHH can't change
 
 - **Kipu (EMR):** Phase 1 is copy and paste into the progress note; the note is already structured JSON, so a Kipu integration is a mapping job, not a rewrite. We have not verified IHH's Kipu contract or API access.
-- **CalOptima Health (funder for Medi-Cal clients):** verified from CalOptima's Community Supports Provider Program Guide (Jan 2026): recuperative care is auto-authorized for 30 days; days 31–60 and 61–90 need a reauthorization in **CalOptima Health Connect** with the **care plan, including discharge planning notes**, uploaded. The care plan form (Appendix I) has the boxes our sections map to: Vital Signs; Care Preferences and Concerns Voiced by Member; Health Education/Interventions Provided; Interventions with status; Member Appointments. Phase 2 of Rounds assembles the signed notes into that field order at day 25/55/85 for whoever uploads. The nurse never touches Health Connect.
+- **The payers:** IHH named Kaiser, L.A. Care, Blue Shield, Molina and CalOptima. We verified one in detail.
+- **CalOptima Health (Medi-Cal clients):** verified from CalOptima's Community Supports Provider Program Guide (Jan 2026): recuperative care is auto-authorized for 30 days; days 31–60 and 61–90 need a reauthorization in **CalOptima Health Connect** with the **care plan, including discharge planning notes**, uploaded. The care plan form (Appendix I) has the boxes our sections map to: Vital Signs; Care Preferences and Concerns Voiced by Member; Health Education/Interventions Provided; Interventions with status; Member Appointments. Phase 2 of Rounds assembles the signed notes into that field order at day 25/55/85 for whoever uploads. The nurse never touches Health Connect.
 
 **Demo video:** [link]
 
@@ -82,7 +94,8 @@ Run the checks on all samples: `npm run eval` (writes `eval/results.md`).
 | Claude drafting | working when `ANTHROPIC_API_KEY` is set; **demo mode uses hand-written outputs** for the three sample clients, written to imitate real model output including one added sentence and one interpretation so the checks can be seen working |
 | Clients and care plan goals | made up; three samples |
 | Kipu integration | none, by design. Output is text you paste. Rounds never reads or writes IHH systems |
-| Name, rooms noted today | stored in the browser only |
+| Med pass log, due-today ticks, flags, name | stored in the browser only, per day |
+| Pass times, med names, appointments | made up for the three sample clients |
 | Tile composing, highlighter, CalOptima box mapping | working; the mapping is our reading of CalOptima's Appendix I, not confirmed with CalOptima or IHH |
 
 ## Where it gets things wrong
@@ -91,6 +104,7 @@ Run the checks on all samples: `npm run eval` (writes `eval/results.md`).
 - The scope-word list is short and English-only. A model can interpret without using any of those words.
 - Spanish teach-sheet lines are not verified against the English ones beyond numbers.
 - The privacy strip is pattern-based. A name it hasn't been told about, or an unusual ID format, gets through. For sample clients it knows the names; for real use IHH would supply the list.
+- The med-pass log fields and note template in Kipu are unknown to us; Rounds holds the data in a sensible order, and the paste or a Kipu API mapping carries it. We do not claim it fills Kipu's form.
 - We have not tested on real IHH note templates or against what CalOptima actually asks for at reauthorization. The sections here are our best guess from the role card.
 - Live model output varies. In demo mode the flagged lines are planted; in live mode they appear when the model slips, which in our experience is sometimes, not always.
 

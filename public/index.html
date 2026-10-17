@@ -144,6 +144,50 @@
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:var(--mist);padding:12px 18px;border-radius:999px;font-weight:700;opacity:0;transition:.2s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%)}
 
+  /* my shift */
+  .home{display:grid;gap:14px}
+  .panel{background:var(--paper);border-radius:var(--r);padding:16px}
+  .ph{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+  .ph h2{margin:0;font-size:20px;font-weight:800}
+  .muted{color:var(--ink-2);font-size:14px}
+  .insight{background:var(--teal);color:var(--on-teal);border-radius:var(--r);padding:16px 18px;font-size:19px;font-weight:700;line-height:1.35}
+  .insight.calm{background:var(--sage-2);color:var(--ink)}
+  .passgrid{display:grid;gap:6px;grid-template-columns:minmax(92px,1.3fr) repeat(var(--np,4),1fr)}
+  .passgrid .hd{font-size:13px;color:var(--ink-2);text-align:center;font-weight:700;padding-bottom:2px}
+  .passgrid .nm{font-weight:800;display:grid;align-content:center;font-size:15px;line-height:1.2}
+  .passgrid .nm span{font-weight:500;color:var(--ink-2);font-size:12px}
+  .cell{min-height:56px;border-radius:var(--r-sm);background:var(--mist);font-weight:800;font-size:13px;display:grid;place-items:center;border:2px solid transparent;padding:4px}
+  .cell.future{opacity:.4}
+  .cell.open{border-color:var(--teal)}
+  .cell.took{background:var(--sage-2);color:var(--sage);border-color:transparent}
+  .cell.missed{background:var(--coral-2);color:var(--coral);border-color:transparent}
+  .cell.side{background:var(--amber-2);color:var(--amber);border-color:transparent}
+  .cell.sel{box-shadow:0 0 0 3px var(--hl)}
+  .pick{margin-top:10px;background:var(--teal-2);border-radius:var(--r);padding:12px;display:grid;gap:8px}
+  .pick .t{font-weight:800}
+  .pick .row{display:flex;gap:8px;flex-wrap:wrap}
+  .pick .row button{flex:1;min-width:100px;background:var(--paper);font-weight:800;border-radius:var(--r-sm)}
+  .pick .row button.took{color:var(--sage)} .pick .row button.missed{color:var(--coral)} .pick .row button.side{color:var(--amber)}
+  .pick input{height:44px;border:2px solid var(--rule);border-radius:var(--r-sm);padding:0 12px;background:var(--paper);width:100%}
+  .gofind{margin-top:12px}
+  .gofind b{display:block;margin-bottom:6px}
+  .gofind ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+  .gofind li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);background:var(--coral-2);font-weight:700}
+  .gofind li svg{width:20px;height:20px;color:var(--coral)}
+  .gofind li.ok{background:var(--sage-2)} .gofind li.ok svg{color:var(--sage)}
+  .due{display:grid;gap:8px}
+  .due .row{display:grid;grid-template-columns:minmax(80px,1fr) 3fr;gap:8px;align-items:center}
+  .due .nm{font-weight:800;font-size:15px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{min-height:40px;padding:4px 12px;border-radius:999px;background:var(--mist);font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:6px;border:2px solid transparent}
+  .chip svg{width:16px;height:16px;flex:none}
+  .chip.on{background:var(--sage-2);color:var(--sage)}
+  .chip.flag.on{background:var(--amber-2);color:var(--amber)}
+  .chip.ready.on{background:var(--teal-2);color:var(--teal)}
+  .chip.auto{border-color:var(--rule);background:transparent}
+  .draftbox{margin:10px 0 0;white-space:pre-wrap;font:15px/1.5 var(--note);background:var(--mist);border-radius:var(--r-sm);padding:12px}
+  .backlink{min-height:0;padding:0 0 10px;color:var(--teal);font-weight:800}
+
   /* first run */
   .hello{background:var(--paper);border-radius:var(--r);padding:20px;margin:16px 0;display:grid;gap:12px}
   .hello h2{margin:0;font-size:24px;font-weight:800}
@@ -188,8 +232,29 @@
     </div>
     <div class="board" id="board" role="tablist"></div>
 
-    <div class="cols">
+    <section class="home" id="home">
+      <div class="insight" id="insight"></div>
+      <div class="panel">
+        <div class="ph"><h2>Med pass</h2><span class="muted" id="passClock"></span></div>
+        <div class="passgrid" id="passgrid"></div>
+        <div id="passPick"></div>
+        <div class="gofind" id="gofind"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><h2>Due today</h2><span class="muted">tap to tick off</span></div>
+        <div class="due" id="due"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><h2>Send</h2><span class="muted">drafts only, you send</span></div>
+        <div class="btns"><button class="btn" id="teamBtn">Message the team</button><button class="btn" id="auditBtn">What's still missing</button></div>
+        <pre class="draftbox" id="draftbox" hidden></pre>
+      </div>
+      <p class="muted" style="font-size:14px;margin:0">Tap a room above to write it up.</p>
+    </section>
+
+    <div class="cols" id="cols" hidden>
       <section class="sheet" id="sheet">
+        <button class="backlink" id="backHome">← My shift</button>
         <div class="who"><div><h2 id="whoName">—</h2><p id="whoSum"></p></div></div>
         <div class="goalrow" id="goalrow"></div>
         <div class="tiles" id="tiles"></div>
@@ -261,9 +326,89 @@
   function showApp(first){
     $('#app').hidden=false;
     $('#greet').textContent=`${greetWord}, ${S.profile.name}`;
-    renderBoard();
-    if(first){ pick(S.clients[0]); S.lines=S.client.sample_jottings.split('\n').map(t=>({t,icon:iconFor(t,'')})); renderLines(); $('#sub').textContent='Here is a sample sheet to try. Tap "Make my note".'; }
+    renderBoard(); goHome();
+    if(first) toast('Start with the med pass. Tap a room when you want to write it up.');
   }
+
+  // ---- my shift: med pass, due today, send
+  const today=new Date().toISOString().slice(0,10);
+  S.log=store.get('log.'+today,{}); S.flags=store.get('flags.'+today,{}); S.selCell=null;
+  const PASS_START={'8am':7,'12pm':11,'5pm':16,'9pm':20};
+  const allPasses=()=>[...new Set(S.clients.flatMap(c=>c.passes||[]))].sort((a,b)=>PASS_START[a]-PASS_START[b]);
+  const isOpen=p=>new Date().getHours()>=PASS_START[p];
+  const latestOpen=()=>allPasses().filter(isOpen).slice(-1)[0];
+  const logOf=(c,p)=>(S.log[c.id]||{})[p];
+  function goHome(){ S.client=null; S.draft=null; S.selCell=null; $('#cols').hidden=true; $('#home').hidden=false; renderBoard(); renderHome(); window.scrollTo({top:0}); }
+  $('#backHome').onclick=goHome;
+  function renderHome(){
+    const passes=allPasses(); const cur=latestOpen();
+    // insight
+    const pending=S.clients.filter(c=>(c.passes||[]).includes(cur)&&!logOf(c,cur));
+    const missedToday=S.clients.flatMap(c=>(c.passes||[]).filter(p=>logOf(c,p)==='missed').map(p=>({c,p})));
+    const side=S.clients.flatMap(c=>(c.passes||[]).filter(p=>logOf(c,p)==='side').map(p=>({c,p})));
+    let ins, calm=false;
+    if(!cur) { ins='No med pass open yet. First one is at 8am.'; calm=true; }
+    else if(pending.length) ins=`${pending.length===1?'1 client hasn\'t':pending.length+' clients haven\'t'} come for the ${cur} pass yet: ${pending.map(c=>c.display.split(' · ')[0]).join(', ')}.`;
+    else { ins=`Everyone is logged for the ${cur} pass.${missedToday.length?` ${missedToday.length} missed earlier today.`:' Nice.'}`; calm=!missedToday.length; }
+    const el=$('#insight'); el.textContent=ins; el.className='insight'+(calm?' calm':'');
+    $('#passClock').textContent=cur?`${cur} pass is open`:'';
+    // grid
+    const g=$('#passgrid'); g.style.setProperty('--np',passes.length);
+    let h=`<div></div>${passes.map(p=>`<div class="hd">${p}</div>`).join('')}`;
+    S.clients.forEach(c=>{
+      const [name,room]=c.display.split(' · ');
+      h+=`<div class="nm">${esc(room.replace('Room ','Rm '))}<span>${esc(name)}</span></div>`;
+      passes.forEach(p=>{
+        if(!(c.passes||[]).includes(p)){ h+=`<div></div>`; return; }
+        const st=logOf(c,p); const open=isOpen(p); const sel=S.selCell&&S.selCell.c===c.id&&S.selCell.p===p;
+        const label=st==='took'?'took it':st==='missed'?'missed':st==='side'?'side fx':open?'tap':'later';
+        h+=`<button class="cell ${st||(open?'open':'future')} ${sel?'sel':''}" data-c="${c.id}" data-p="${p}" aria-label="${esc(name)} ${p} pass: ${label}">${label}</button>`;
+      });
+    });
+    g.innerHTML=h;
+    g.querySelectorAll('.cell').forEach(b=>b.onclick=()=>{ S.selCell={c:b.dataset.c,p:b.dataset.p}; renderHome(); });
+    // picker
+    const pk=$('#passPick');
+    if(S.selCell){ const c=S.clients.find(x=>x.id===S.selCell.c); const p=S.selCell.p; const cur=logOf(c,p);
+      pk.innerHTML=`<div class="pick"><div class="t">${esc(c.display.split(' · ')[0])} · ${p} pass · ${esc((c.meds||[]).join(', '))}</div>
+        <div class="row"><button class="took" data-st="took">Took it, I watched</button><button class="missed" data-st="missed">Didn't come</button><button class="side" data-st="side">Side effect</button>${cur?'<button data-st="">Clear</button>':''}</div>
+        <input type="text" id="sideNote" placeholder="what they said (optional)"></div>`;
+      pk.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{ S.log[c.id]=S.log[c.id]||{}; if(b.dataset.st){ S.log[c.id][p]=b.dataset.st; const n=$('#sideNote').value.trim(); if(n) S.log[c.id][p+':note']=n; } else { delete S.log[c.id][p]; delete S.log[c.id][p+':note']; } store.set('log.'+today,S.log); S.selCell=null; renderHome(); });
+    } else pk.innerHTML='';
+    // go find
+    const gf=$('#gofind');
+    const find=[...pending.map(c=>({c,why:`${cur} pass`})), ...missedToday.filter(m=>m.p!==cur).map(m=>({c:m.c,why:`missed ${m.p}`}))];
+    gf.innerHTML = cur ? `<b>${find.length?'Go find':'Nobody to chase'}</b><ul>${find.length?find.map(f=>`<li>${svg('walk')}<span>${esc(f.c.display)}</span><span class="muted" style="margin-left:auto">${esc(f.why)}</span></li>`).join(''):'<li class="ok">'+svg('shield')+'<span>All logged for this pass.</span></li>'}</ul>` : '';
+    // due today
+    const d=$('#due');
+    d.innerHTML=S.clients.map(c=>{ const f=S.flags[c.id]||{}; const open=(c.passes||[]).filter(isOpen); const took=open.filter(p=>logOf(c,p)); const [name,room]=c.display.split(' · ');
+      return `<div class="row"><div class="nm">${esc(room.replace('Room ','Rm '))}<br><span class="muted">${esc(name)}</span></div><div class="chips">
+        <span class="chip auto ${open.length&&took.length===open.length?'on':''}">${svg('pill')} meds ${took.length}/${open.length}</span>
+        <button class="chip ${f.vitals?'on':''}" data-flag="vitals" data-c="${c.id}">${svg('heart')} vitals</button>
+        <button class="chip ${S.done[c.id]?'on':''}" data-pick="${c.id}">${svg('note')} note</button>
+        ${(c.appointments||[]).length?`<button class="chip ${f.appt?'on':''}" data-flag="appt" data-c="${c.id}">${svg('next')} ${esc(c.appointments[0].what)} ${esc(c.appointments[0].when)}</button>`:''}
+        <button class="chip flag ${f.doctor?'on':''}" data-flag="doctor" data-c="${c.id}">doctor should look</button>
+        <button class="chip ready ${f.ready?'on':''}" data-flag="ready" data-c="${c.id}">ready soon</button>
+      </div></div>`; }).join('');
+    d.querySelectorAll('[data-flag]').forEach(b=>b.onclick=()=>{ const c=b.dataset.c; S.flags[c]=S.flags[c]||{}; S.flags[c][b.dataset.flag]=!S.flags[c][b.dataset.flag]; store.set('flags.'+today,S.flags); renderHome(); });
+    d.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>pick(S.clients.find(c=>c.id===b.dataset.pick)));
+  }
+  function draftText(kind){
+    const nm=c=>c.display; const f=c=>S.flags[c.id]||{};
+    const ready=S.clients.filter(c=>f(c).ready), doc=S.clients.filter(c=>f(c).doctor);
+    const missed=S.clients.flatMap(c=>(c.passes||[]).filter(p=>logOf(c,p)==='missed').map(p=>`${nm(c)} (${p})`));
+    const side=S.clients.flatMap(c=>(c.passes||[]).filter(p=>logOf(c,p)==='side').map(p=>`${nm(c)} (${p}${S.log[c.id][p+':note']?': '+S.log[c.id][p+':note']:''})`));
+    if(kind==='team'){
+      return `Shift update from ${S.profile.name}, ${new Date().toLocaleDateString()}\n\n`+
+        (ready.length?`Ready to move out soon: ${ready.map(nm).join('; ')}\n`:'')+(doc.length?`A doctor should look at: ${doc.map(nm).join('; ')}\n`:'')+
+        (missed.length?`Missed a med pass today: ${missed.join('; ')}\n`:'')+(side.length?`Side effects reported: ${side.join('; ')}\n`:'')+
+        (!ready.length&&!doc.length&&!missed.length&&!side.length?'Nothing flagged today.\n':'')+`\n(Drafted in Rounds. Review before sending.)`;
+    }
+    const miss=[]; S.clients.forEach(c=>{ const open=(c.passes||[]).filter(isOpen); open.filter(p=>!logOf(c,p)).forEach(p=>miss.push(`${nm(c)}: ${p} med pass not logged`)); if(!f(c).vitals) miss.push(`${nm(c)}: vitals not ticked`); if(!S.done[c.id]) miss.push(`${nm(c)}: no note yet`); });
+    return `Still missing today (${new Date().toLocaleDateString()})\n\n`+(miss.length?miss.map(m=>'- '+m).join('\n'):'Nothing. Everything due so far is logged.')+`\n\nThis is the list a reviewer would build later. Better to see it now.`;
+  }
+  function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
+  $('#teamBtn').onclick=()=>showDraft('team'); $('#auditBtn').onclick=()=>showDraft('audit');
   $('#resetLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');localStorage.removeItem('rounds.done');}catch(_){} location.reload();};
 
   function renderBoard(){
@@ -276,7 +421,7 @@
     const dots=$('#dots'); dots.innerHTML=S.clients.map(c=>`<i class="${S.done[c.id]?'on':''}"></i>`).join('');
     const n=Object.keys(S.done).filter(k=>S.done[k]).length; $('#sub').textContent = n? `${n} of ${S.clients.length} noted at the time today.` : 'Pick a room to start.';
   }
-  function pick(c){ S.client=c; S.lines=[]; S.draft=null; S.dec={}; S.open=null; renderBoard(); renderWho(); renderTiles(); renderLines(); renderDraft(); }
+  function pick(c){ S.client=c; S.lines=[]; S.draft=null; S.dec={}; S.open=null; $('#home').hidden=true; $('#cols').hidden=false; renderBoard(); renderWho(); renderTiles(); renderLines(); renderDraft(); window.scrollTo({top:0}); }
   function renderWho(){ const [name]=S.client.display.split(' · '); $('#whoName').textContent=S.client.display; $('#whoSum').textContent=S.client.summary;
     $('#goalrow').innerHTML=S.client.goals.map(g=>`<span class="goal" title="${esc(g.text)}">${svg(iconFor(g.text,''))}<span>${esc(g.id)} · ${esc(g.text.length>34?g.text.slice(0,34)+'…':g.text)}</span></span>`).join(''); }
   function renderTiles(){ $('#tiles').innerHTML=TILES.map(t=>`<button class="tile" data-tile="${t.id}" aria-expanded="${S.open===t.id}">${svg(t.icon)}<span>${esc(t.label)}</span></button>`).join('');

@@ -1,41 +1,132 @@
 {
-  "about": "Made-up clients for the Rounds prototype. No real person. Names are placeholders and are stripped before anything leaves the browser.",
+  "about": "Made-up clients for the Rounds prototype. No real person. Names are placeholders and are stripped before anything leaves the browser. Pass times, med names and appointments are made up for the med-pass board.",
   "clients": [
     {
       "id": "robert",
       "display": "Robert · Room 4",
-      "names": ["Robert", "Rob"],
+      "names": [
+        "Robert",
+        "Rob"
+      ],
       "summary": "58, admitted after a hospital stay for a leg wound. Type 2 diabetes on oral medication. Walks with a cane.",
       "goals": [
-        { "id": "G1", "text": "Checks blood sugar before meals and records it in the log independently" },
-        { "id": "G2", "text": "Keeps left lower leg wound clean and dry; dressing changes per home health schedule" },
-        { "id": "G3", "text": "Takes own medications on schedule without prompting" }
+        {
+          "id": "G1",
+          "text": "Checks blood sugar before meals and records it in the log independently"
+        },
+        {
+          "id": "G2",
+          "text": "Keeps left lower leg wound clean and dry; dressing changes per home health schedule"
+        },
+        {
+          "id": "G3",
+          "text": "Takes own medications on schedule without prompting"
+        }
       ],
-      "sample_jottings": "rm4 BS 142 before lunch, took own metformin, watched him do it\nL leg dressing dry + intact, says HH came yesterday\nasked how to write down readings, showed him the log sheet, he did one entry himself\nsays knee hurts when walking, didn't want tylenol\ncall HH to confirm next dressing change day"
+      "sample_jottings": "rm4 BS 142 before lunch, took own metformin, watched him do it\nL leg dressing dry + intact, says HH came yesterday\nasked how to write down readings, showed him the log sheet, he did one entry himself\nsays knee hurts when walking, didn't want tylenol\ncall HH to confirm next dressing change day",
+      "passes": [
+        "8am",
+        "12pm",
+        "5pm",
+        "9pm"
+      ],
+      "meds": [
+        "metformin",
+        "lisinopril"
+      ],
+      "vitals_due": [
+        "blood sugar before meals",
+        "blood pressure"
+      ],
+      "appointments": [
+        {
+          "when": "Fri",
+          "what": "wound clinic"
+        }
+      ]
     },
     {
       "id": "dolores",
       "display": "Dolores · Room 7",
-      "names": ["Dolores", "Dee"],
+      "names": [
+        "Dolores",
+        "Dee"
+      ],
       "summary": "66, admitted after a hospital stay for high blood pressure. Uses a walker. Prefers Spanish.",
       "goals": [
-        { "id": "G1", "text": "Takes blood pressure medication as scheduled, self-administered" },
-        { "id": "G2", "text": "Walks 100 feet with walker twice a day" },
-        { "id": "G3", "text": "Attends primary care follow-up appointment" }
+        {
+          "id": "G1",
+          "text": "Takes blood pressure medication as scheduled, self-administered"
+        },
+        {
+          "id": "G2",
+          "text": "Walks 100 feet with walker twice a day"
+        },
+        {
+          "id": "G3",
+          "text": "Attends primary care follow-up appointment"
+        }
       ],
-      "sample_jottings": "rm7 BP 138/84 HR 76 at 9am\ntook own lisinopril, had it in her pill box already\nwalked to the dining room and back w walker, ~120ft, one rest\nsays dizzy when she stands up fast, told her to sit on edge of bed first\nstill needs ride set up for clinic appt thurs, told CM"
+      "sample_jottings": "rm7 BP 138/84 HR 76 at 9am\ntook own lisinopril, had it in her pill box already\nwalked to the dining room and back w walker, ~120ft, one rest\nsays dizzy when she stands up fast, told her to sit on edge of bed first\nstill needs ride set up for clinic appt thurs, told CM",
+      "passes": [
+        "8am",
+        "12pm",
+        "5pm",
+        "9pm"
+      ],
+      "meds": [
+        "lisinopril",
+        "amlodipine"
+      ],
+      "vitals_due": [
+        "blood pressure"
+      ],
+      "appointments": [
+        {
+          "when": "Thu",
+          "what": "primary care"
+        }
+      ]
     },
     {
       "id": "marcus",
       "display": "Marcus · Room 2",
-      "names": ["Marcus", "Marc"],
+      "names": [
+        "Marcus",
+        "Marc"
+      ],
       "summary": "34, admitted after a hospital stay for a skin infection on the right arm. On oral antibiotics.",
       "goals": [
-        { "id": "G1", "text": "Completes oral antibiotic course independently" },
-        { "id": "G2", "text": "Right arm redness and swelling decrease; reports any fever or spreading" },
-        { "id": "G3", "text": "Attends wound check appointment" }
+        {
+          "id": "G1",
+          "text": "Completes oral antibiotic course independently"
+        },
+        {
+          "id": "G2",
+          "text": "Right arm redness and swelling decrease; reports any fever or spreading"
+        },
+        {
+          "id": "G3",
+          "text": "Attends wound check appointment"
+        }
       ],
-      "sample_jottings": "rm2 temp 98.4\ntook AM antibiotic himself, 4 pills left in the pack\nR arm redness looks smaller than yesterday, marked edge w pen again, no drainage\nhe says it itches, told him not to scratch and to tell us if it gets hot or red past the line\nasked about job stuff, told him CM can help"
+      "sample_jottings": "rm2 temp 98.4\ntook AM antibiotic himself, 4 pills left in the pack\nR arm redness looks smaller than yesterday, marked edge w pen again, no drainage\nhe says it itches, told him not to scratch and to tell us if it gets hot or red past the line\nasked about job stuff, told him CM can help",
+      "passes": [
+        "8am",
+        "5pm"
+      ],
+      "meds": [
+        "cephalexin"
+      ],
+      "vitals_due": [
+        "temp"
+      ],
+      "appointments": [
+        {
+          "when": "Mon",
+          "what": "wound check"
+        }
+      ]
     }
   ]
 }
