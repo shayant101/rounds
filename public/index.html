@@ -229,6 +229,10 @@
     body:has(#home[hidden]) button.mic{bottom:18px}
   }
   @media(pointer:coarse){.due .chip.small{min-height:40px;padding:4px 12px}.due .flagbtn{width:40px;min-height:40px}}
+  .devsw{position:fixed;left:18px;bottom:18px;z-index:20;display:flex;gap:2px;background:var(--paper);border:2px solid var(--rule);border-radius:999px;padding:4px;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+  .devsw button{min-height:0;width:40px;height:40px;border-radius:50%;border:0;background:transparent;color:var(--ink-2);display:grid;place-items:center;cursor:pointer;padding:0}
+  .devsw button svg{width:20px;height:20px}
+  .devsw button.on,.devsw button:hover{background:var(--mist);color:var(--ink)}
   .mic{position:fixed;right:18px;bottom:18px;width:60px;height:60px;border-radius:50%;background:var(--teal);color:var(--on-teal);display:grid;place-items:center;box-shadow:0 6px 24px rgba(129,228,10,.25);z-index:20;min-height:0}
   .mic svg{width:28px;height:28px}
   .mic.on{animation:breathe 1.4s ease-in-out infinite;background:var(--coral)}
@@ -437,6 +441,8 @@
     <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="switchLink">Switch person</a> · <a href="#" id="resetLink">Reset demo</a></p>
   </div>
 </div>
+<div class="devsw" id="devsw" hidden aria-label="Preview as"><button class="on" title="Desktop" aria-label="Desktop" data-d="laptop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 19h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><button title="Tablet" aria-label="Tablet" data-d="tablet"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="17.5" r="1" fill="currentColor"/></svg></button><button title="Phone" aria-label="Phone" data-d="phone"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 5.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+<script>(function(){var sw=document.getElementById('devsw');function show(){sw.hidden=!(window.top===window&&window.innerWidth>=980);}show();window.addEventListener('resize',show);sw.querySelectorAll('[data-d]').forEach(function(b){b.onclick=function(){if(b.dataset.d==='laptop')return;location.href='../views/?d='+b.dataset.d+'&p=app/';};});})();</script>
 <button class="mic" id="micBtn" aria-label="Tell Rounds what to log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 <div class="voice" id="voice" hidden>
   <div class="vhd"><b id="vTitle">Listening…</b><button class="sm" id="vClose" aria-label="close">✕</button></div>
