@@ -1,0 +1,21 @@
+{
+  "name": "rounds",
+  "version": "1.0.0",
+  "description": "You jot. It drafts. You sign. A note helper for recuperative care nurses.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "eval": "node eval/run.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
+    "dotenv": "^18.0.8",
+    "express": "^4.22.3"
+  }
+}

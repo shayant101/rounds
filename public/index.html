@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rounds</title>
+<meta name="description" content="You jot. It drafts. You sign. A note helper for recuperative care nurses.">
+<style>
+  :root{
+    --bg:#f6f4ef; --panel:#ffffff; --ink:#1f2421; --muted:#5f6963; --line:#e3ded4;
+    --accent:#0f766e; --accent-ink:#ffffff; --soft:#e6f2f0;
+    --red:#b42318; --red-bg:#fdecea; --amber:#9a6700; --amber-bg:#fff4d6; --green:#1a7f37; --green-bg:#e7f5ea;
+    --radius:12px; --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(31,36,33,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141715; --panel:#1d211e; --ink:#eef0ec; --muted:#a3aca6; --line:#2d332f;
+      --accent:#2dd4bf; --accent-ink:#0b1412; --soft:#15302c;
+      --red:#ff8a80; --red-bg:#3a1b19; --amber:#ffd166; --amber-bg:#3a2e12; --green:#7ee2a0; --green-bg:#16301f;
+      --shadow:none;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:5}
+  .logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;letter-spacing:-.5px}
+  header h1{font-size:18px;margin:0;line-height:1.1}
+  header p{margin:0;color:var(--muted);font-size:13px}
+  .badge{margin-left:auto;font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .badge.live{border-color:var(--green);color:var(--green)}
+  main{max-width:1180px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr;gap:16px}
+  @media(min-width:960px){main{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+  h2{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .step{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--soft);color:var(--accent);font-size:12px;font-weight:700}
+  .muted{color:var(--muted)} .small{font-size:13px}
+  .firstrun{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--soft);border:1px solid transparent;border-radius:var(--radius);padding:12px 14px}
+  .firstrun b{color:var(--accent)}
+  .clients{display:grid;gap:8px}
+  .client{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);cursor:pointer;font:inherit}
+  .client[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  .client .name{font-weight:600}
+  .goals{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:4px}
+  .goals li{font-size:13px;color:var(--muted);display:flex;gap:8px}
+  .chip{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--soft);color:var(--accent);white-space:nowrap;align-self:start;margin-top:2px}
+  textarea{width:100%;min-height:150px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:12px;font:15px/1.5 inherit;background:var(--panel);color:var(--ink)}
+  textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+  button{font:inherit;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:9px 14px;cursor:pointer}
+  button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.sm{padding:5px 10px;font-size:13px}
+  .phr{display:flex;flex-wrap:wrap;gap:6px}
+  .phr code{font-size:12px;background:var(--soft);padding:2px 6px;border-radius:6px}
+  .privacy{border-left:3px solid var(--accent);padding-left:12px}
+  .privacy pre{white-space:pre-wrap;margin:6px 0;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--muted);max-height:140px;overflow:auto}
+  .removed{display:flex;flex-wrap:wrap;gap:6px}
+  .removed span{font-size:12px;background:var(--amber-bg);color:var(--amber);padding:2px 8px;border-radius:999px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+  .stat{border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+  .stat b{display:block;font-size:22px;line-height:1.1}
+  .stat.good b{color:var(--green)} .stat.bad b{color:var(--red)} .stat.warn b{color:var(--amber)}
+  .section h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 0 6px}
+  .sent{display:grid;grid-template-columns:14px 1fr;gap:10px;padding:10px;border-radius:10px;border:1px solid var(--line);margin-bottom:8px;background:var(--panel)}
+  .sent.red{border-color:var(--red);background:var(--red-bg)} .sent.amber{border-color:var(--amber);background:var(--amber-bg)}
+  .sent.removed{opacity:.45;text-decoration:line-through}
+  .dot{width:10px;height:10px;border-radius:50%;margin-top:8px;background:var(--green)}
+  .red .dot{background:var(--red)} .amber .dot{background:var(--amber)}
+  .sent [contenteditable]{outline:none;border-bottom:1px dashed transparent}
+  .sent [contenteditable]:focus{border-bottom-color:var(--accent)}
+  .why{font-size:13px;margin-top:4px;color:var(--red);font-weight:600} .amber .why{color:var(--amber)}
+  .src{font-size:13px;color:var(--muted);margin-top:4px}
+  .src q{font-style:italic}
+  .acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ask{background:var(--soft);border-radius:10px;padding:10px 12px;margin-top:14px}
+  .ask ul{margin:6px 0 0;padding-left:18px}
+  .sheet{border:1px dashed var(--line);border-radius:10px;padding:14px;margin-top:14px}
+  .sheet ul{margin:8px 0 0;padding-left:20px;font-size:17px;line-height:1.6}
+  .tabs{display:flex;gap:6px}
+  .tabs button[aria-pressed="true"]{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+  .sign{margin-top:14px;padding:12px;border-radius:10px;border:1px solid var(--line);display:grid;gap:8px}
+  .sign label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+  .empty{color:var(--muted);text-align:center;padding:40px 10px}
+  .empty .big{font-size:40px;line-height:1;margin-bottom:8px}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  details summary{cursor:pointer;color:var(--muted);font-size:13px}
+  .err{color:var(--red);font-size:14px;margin-top:8px}
+  @media print{ body *{visibility:hidden} #printArea, #printArea *{visibility:visible} #printArea{position:absolute;left:0;top:0;width:100%;padding:24px;font-size:18px} }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">R</div>
+  <div><h1>Rounds</h1><p>You jot. It drafts. You sign.</p></div>
+  <span class="badge" id="mode">checking…</span>
+</header>
+
+<main>
+  <section>
+    <div class="firstrun" id="firstrun">
+      <div><b>First time?</b> Try it on a sample client. Nothing real, nothing saved. About 60 seconds.</div>
+      <button class="primary" id="tryBtn">Try it with Robert</button>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h2><span class="step">1</span> Who did you see?</h2>
+      <p class="muted small" style="margin:0 0 10px">Sample clients only. Their care plan goals are what the note gets linked to.</p>
+      <div class="clients" id="clients"></div>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h2><span class="step">2</span> Your jottings</h2>
+      <p class="muted small" style="margin:0 0 8px">Type the way you'd write on paper. Short. Messy is fine. One line per thing you saw, heard or did.</p>
+      <textarea id="jot" placeholder="rm4 BS 142 before lunch, took own metformin&#10;L leg dressing dry..."></textarea>
+      <div class="row">
+        <span class="small muted">Shortcuts:</span>
+        <div class="phr" id="phrases"></div>
+        <button class="sm" id="editPhr">Edit</button>
+      </div>
+      <div class="row"><button class="sm" id="sampleBtn">Use sample jottings</button><button class="sm" id="clearBtn">Clear</button></div>
+    </div>
+
+    <div class="panel privacy" style="margin-top:16px">
+      <h2><span class="step">3</span> What leaves this screen</h2>
+      <p class="muted small" style="margin:0">Names and ID-like numbers are removed in your browser first. This is exactly the text the AI will get.</p>
+      <pre id="stripped">—</pre>
+      <div class="removed" id="removed"></div>
+      <div class="row">
+        <button class="primary" id="draftBtn" disabled>Draft the note</button>
+        <span class="small muted">Nothing is saved anywhere. Nothing is sent to Kipu.</span>
+      </div>
+      <div class="err" id="err"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="panel" id="result">
+      <div class="empty"><div class="big">✎</div>Your draft will show up here, one line at a time, each one pointing back to what you wrote.</div>
+    </div>
+  </section>
+</main>
+
+<div id="printArea" hidden></div>
+<div class="toast" id="toast"></div>
+
+<script src="verify.js"></script>
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const V = window.RoundsVerify;
+  const state = { clients: [], client: null, draft: null, check: null, stripped: '', decisions: {}, lang: 'en', mode: 'mock' };
+
+  const DEFAULT_PHRASES = { '.bs':'blood sugar', '.bp':'blood pressure', '.hh':'home health', '.cm':'case manager', '.dc':'dressing change', '.wnl':'' };
+  function loadPhrases(){ try{ const p = JSON.parse(localStorage.getItem('rounds.phrases')||'null'); if(p) return p; }catch(e){} return Object.assign({}, DEFAULT_PHRASES); }
+  function savePhrases(p){ try{ localStorage.setItem('rounds.phrases', JSON.stringify(p)); }catch(e){} }
+  let phrases = loadPhrases();
+  delete phrases['.wnl']; // never offer a "within normal limits" shortcut; it is the filler we are trying to stop
+
+  function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); }
+
+  // ---------- setup
+  fetch('/api/health').then(r=>r.json()).then(h=>{
+    state.mode = h.mode;
+    const b = $('#mode');
+    b.textContent = h.mode==='live' ? 'Live · Claude' : 'Demo mode · sample clients only';
+    b.className = 'badge' + (h.mode==='live'?' live':'');
+  }).catch(()=>{ $('#mode').textContent='offline'; });
+
+  fetch('/api/clients').then(r=>r.json()).then(d=>{ state.clients=d.clients; renderClients(); });
+
+  function renderClients(){
+    const box = $('#clients'); box.innerHTML='';
+    state.clients.forEach(c=>{
+      const b = document.createElement('button');
+      b.className='client'; b.setAttribute('aria-pressed', String(state.client && state.client.id===c.id));
+      b.innerHTML = `<div class="name">${esc(c.display)}</div><div class="small muted">${esc(c.summary)}</div>
+        <ul class="goals">${c.goals.map(g=>`<li><span class="chip">${g.id}</span><span>${esc(g.text)}</span></li>`).join('')}</ul>`;
+      b.onclick=()=>{ state.client=c; renderClients(); updateStrip(); };
+      box.appendChild(b);
+    });
+  }
+
+  function renderPhrases(){
+    $('#phrases').innerHTML = Object.entries(phrases).map(([k,v])=>`<code>${esc(k)} → ${esc(v)}</code>`).join('');
+  }
+  renderPhrases();
+  $('#editPhr').onclick=()=>{
+    const cur = Object.entries(phrases).map(([k,v])=>k+' = '+v).join('\n');
+    const next = prompt('Your shortcuts, one per line, like  .bs = blood sugar', cur);
+    if(next===null) return;
+    const p={}; next.split('\n').forEach(l=>{ const m=l.split('='); if(m.length>=2){ const k=m[0].trim(), v=m.slice(1).join('=').trim(); if(k&&v) p[k]=v; }});
+    phrases=p; savePhrases(p); renderPhrases();
+  };
+
+  // expand ".bs " -> "blood sugar "
+  $('#jot').addEventListener('input', e=>{
+    const ta=e.target; const pos=ta.selectionStart; const before=ta.value.slice(0,pos);
+    const m = before.match(/(\.[a-z]{1,5})([ \n,])$/i);
+    if(m && phrases[m[1].toLowerCase()]){
+      const rep = phrases[m[1].toLowerCase()] + m[2];
+      ta.value = before.slice(0, -m[0].length) + rep + ta.value.slice(pos);
+      const np = pos - m[0].length + rep.length; ta.setSelectionRange(np,np);
+    }
+    updateStrip();
+  });
+
+  function updateStrip(){
+    const names = state.client ? state.client.names : [];
+    const r = V.stripIdentifiers($('#jot').value, names);
+    state.stripped = r.text;
+    $('#stripped').textContent = r.text.trim() ? r.text : '—';
+    $('#removed').innerHTML = r.removed.length ? '<span>removed: </span>' + r.removed.map(x=>`<span>${esc(x.kind)}: ${esc(x.value)}</span>`).join('') : '<span style="background:var(--green-bg);color:var(--green)">no names or ID numbers found</span>';
+    $('#draftBtn').disabled = !(state.client && r.text.trim());
+  }
+
+  $('#sampleBtn').onclick=()=>{ if(!state.client){ toast('Pick a client first'); return; } $('#jot').value=state.client.sample_jottings; updateStrip(); };
+  $('#clearBtn').onclick=()=>{ $('#jot').value=''; updateStrip(); };
+  $('#tryBtn').onclick=()=>{ state.client=state.clients.find(c=>c.id==='robert')||state.clients[0]; renderClients(); $('#jot').value=state.client.sample_jottings; updateStrip(); $('#firstrun').style.display='none'; draft(); };
+  $('#draftBtn').onclick=draft;
+
+  async function draft(){
+    $('#err').textContent=''; $('#draftBtn').disabled=true; $('#draftBtn').textContent='Drafting…';
+    try{
+      const res = await fetch('/api/draft',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({clientId:state.client.id, jottings:state.stripped})});
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error||'Failed');
+      state.draft=data.draft; state.decisions={}; state.check=V.checkDraft(data.draft, state.stripped);
+      state.modelLabel = data.model;
+      render();
+      $('#result').scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(e){ $('#err').textContent=e.message; }
+    finally{ $('#draftBtn').disabled=false; $('#draftBtn').textContent='Draft the note'; }
+  }
+
+  // ---------- render draft
+  function render(){
+    const c=state.check, d=state.draft; const box=$('#result');
+    const fromYou = c.clean + c.amber; // lines with a verified source
+    const unresolved = c.items.filter((it,i)=>it.status!=='clean' && !state.decisions[i]).length;
+    let html = `
+      <div class="meta"><h2 style="margin:0">Draft for ${esc(state.client.display)}</h2><span class="badge">${esc(state.modelLabel||'')}</span></div>
+      <div class="stats" style="margin-top:10px">
+        <div class="stat good"><b>${fromYou}/${c.sentences}</b><span class="small muted">lines traced to your jottings</span></div>
+        <div class="stat ${c.red?'bad':'good'}"><b>${c.red}</b><span class="small muted">added or wrong, needs you</span></div>
+        <div class="stat"><b>${c.goalLinked}/${c.sentences}</b><span class="small muted">linked to a care plan goal</span></div>
+      </div>`;
+    let i=0;
+    d.note.sections.forEach(sec=>{
+      html += `<div class="section"><h3>${esc(sec.title)}</h3>`;
+      sec.sentences.forEach(s=>{
+        const it=c.items[i]; const dec=state.decisions[i]; const idx=i;
+        const cls = dec==='remove' ? 'removed' : (dec==='keep' ? '' : it.status);
+        html += `<div class="sent ${cls}" data-i="${idx}"><div class="dot"></div><div>
+          <div contenteditable="${dec==='remove'?'false':'true'}" spellcheck="false" data-edit="${idx}">${esc(s.text)}</div>
+          ${it.problems.length && dec!=='remove' && dec!=='keep' ? it.problems.map(p=>`<div class="why">${esc(p.msg)}</div>`).join('') : ''}
+          <div class="src">${s.goal?`<span class="chip">${esc(s.goal)}</span> `:''}${s.source?`from your jotting: <q>${esc(s.source)}</q>`:'<span style="color:var(--red)">no jotting to point to</span>'}</div>
+          ${it.status!=='clean' && !dec ? `<div class="acts"><button class="sm" data-act="remove" data-i="${idx}">Remove line</button><button class="sm" data-act="keep" data-i="${idx}">Keep, I'm sure</button></div>`:''}
+          ${dec ? `<div class="acts"><button class="sm" data-act="undo" data-i="${idx}">Undo</button></div>`:''}
+        </div></div>`;
+        i++;
+      });
+      html += `</div>`;
+    });
+    if(d.not_documented && d.not_documented.length){
+      html += `<div class="ask"><b>Not in your jottings</b> <span class="small muted">— a reviewer may ask. Add it only if it's true.</span><ul>${d.not_documented.map(q=>`<li>${esc(q)}</li>`).join('')}</ul></div>`;
+    }
+    // teach sheet
+    const ts = d.teach_sheet||{en:[],es:[]}; const lines = ts[state.lang]||[];
+    const jotNums = new Set(V.numbersIn(state.stripped));
+    html += `<div class="sheet"><div class="meta"><b>Teach sheet for the client</b><span class="small muted">plain words, only what you taught</span>
+        <div class="tabs" style="margin-left:auto"><button class="sm" data-lang="en" aria-pressed="${state.lang==='en'}">English</button><button class="sm" data-lang="es" aria-pressed="${state.lang==='es'}">Español</button></div></div>
+      <ul>${lines.map(l=>{ const bad=V.numbersIn(l).filter(n=>!jotNums.has(n)); return `<li>${esc(l)}${bad.length?` <span class="why" style="display:inline">number not in your jottings: ${bad.join(', ')}</span>`:''}</li>`; }).join('')}</ul>
+      <div class="row"><button class="sm" id="printSheet">Print for client</button></div></div>`;
+    // sign
+    html += `<div class="sign">
+      <label><input type="checkbox" id="ack" ${unresolved?'disabled':''}> <span>I read every line. This note says what I saw and did, nothing more.${unresolved?` <b style="color:var(--red)">(${unresolved} flagged line${unresolved>1?'s':''} still need${unresolved>1?'':'s'} a decision)</b>`:''}</span></label>
+      <div class="row"><button class="primary" id="copyBtn" disabled>Copy note for Kipu</button><span class="small muted">Paste into the progress note field. Rounds never writes to Kipu.</span></div>
+    </div>`;
+    box.innerHTML=html;
+
+    box.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; const a=b.dataset.act; if(a==='undo') delete state.decisions[i]; else state.decisions[i]=a; render(); });
+    box.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{ state.lang=b.dataset.lang; render(); });
+    box.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('input',()=>{ const i=+el.dataset.edit; c.items[i].text=el.textContent; }));
+    const ack=$('#ack'); ack.onchange=()=>{ $('#copyBtn').disabled=!ack.checked; };
+    $('#copyBtn').onclick=copyNote;
+    $('#printSheet').onclick=()=>{ const pa=$('#printArea'); pa.hidden=false; pa.innerHTML=`<h2>${state.lang==='es'?'Para usted':'For you'}</h2><ul style="font-size:20px;line-height:1.7">${lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul><p style="color:#666">${state.lang==='es'?'Pregunte al personal si tiene dudas.':'Ask staff if you have questions.'}</p>`; window.print(); setTimeout(()=>{pa.hidden=true;},500); };
+  }
+
+  function copyNote(){
+    const c=state.check; const parts=[]; let cur=null;
+    c.items.forEach((it,i)=>{ if(state.decisions[i]==='remove') return; if(it.section!==cur){ cur=it.section; parts.push('\n'+cur.toUpperCase()); } parts.push('- '+it.text+(it.goal?'  ['+it.goal+']':'')); });
+    const goals = (state.client.goals||[]).map(g=>g.id+': '+g.text).join('; ');
+    const text = `PROGRESS NOTE (draft from staff jottings, reviewed and edited by staff)\nClient: ${state.client.display}\nCare plan goals: ${goals}\n${parts.join('\n')}\n\nReviewed and signed by: ____________  Date/time: ____________`;
+    const done=()=>toast('Copied. Paste it into Kipu.');
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(()=>fallback(text,done)); } else fallback(text,done);
+  }
+  function fallback(text,done){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} ta.remove(); done(); }
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+})();
+</script>
+</body>
+</html>

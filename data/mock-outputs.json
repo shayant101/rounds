@@ -1,0 +1,144 @@
+{
+  "about": "Hand-written outputs used when no ANTHROPIC_API_KEY is set, so the prototype runs with zero setup. They imitate what Claude returns for the three sample clients, including the kinds of mistakes a real model makes (one sentence added without a source, one sentence that slips into clinical interpretation) so the safety checks can be seen working. With a key set, these are not used.",
+  "robert": {
+    "note": {
+      "sections": [
+        {
+          "title": "Observed",
+          "sentences": [
+            { "text": "Blood sugar 142 before lunch.", "source": "BS 142 before lunch", "goal": "G1" },
+            { "text": "Client took his own metformin; staff watched him do it.", "source": "took own metformin, watched him do it", "goal": "G3" },
+            { "text": "Left leg dressing dry and intact.", "source": "L leg dressing dry + intact", "goal": "G2" },
+            { "text": "Client tolerated the dressing check well.", "source": null, "goal": "G2" }
+          ]
+        },
+        {
+          "title": "Client reports",
+          "sentences": [
+            { "text": "Client says home health came yesterday.", "source": "says HH came yesterday", "goal": "G2" },
+            { "text": "Client says his knee hurts when walking and did not want Tylenol.", "source": "says knee hurts when walking, didn't want tylenol", "goal": null }
+          ]
+        },
+        {
+          "title": "Teaching and actions",
+          "sentences": [
+            { "text": "Client asked how to write down his readings; staff showed him the log sheet and he did one entry himself.", "source": "asked how to write down readings, showed him the log sheet, he did one entry himself", "goal": "G1" }
+          ]
+        },
+        {
+          "title": "Follow-up / handoff",
+          "sentences": [
+            { "text": "Call home health to confirm the next dressing change day.", "source": "call HH to confirm next dressing change day", "goal": "G2" }
+          ]
+        }
+      ]
+    },
+    "not_documented": [
+      "Was the knee pain new today, or has he mentioned it before?",
+      "Did you look at the wound itself, or only the outside of the dressing?"
+    ],
+    "teach_sheet": {
+      "en": [
+        "Write your blood sugar number in the log before each meal, like you did today.",
+        "Keep the dressing on your left leg dry. Tell staff if it gets wet or comes loose.",
+        "Home health will come for your next dressing change. We will confirm the day."
+      ],
+      "es": [
+        "Anote su número de azúcar en la sangre en el registro antes de cada comida, como lo hizo hoy.",
+        "Mantenga seco el vendaje de su pierna izquierda. Avise al personal si se moja o se afloja.",
+        "Salud en el hogar vendrá para su próximo cambio de vendaje. Le confirmaremos el día."
+      ]
+    }
+  },
+  "dolores": {
+    "note": {
+      "sections": [
+        {
+          "title": "Observed",
+          "sentences": [
+            { "text": "Blood pressure 138/84, heart rate 76 at 9am.", "source": "BP 138/84 HR 76 at 9am", "goal": "G1" },
+            { "text": "Client took her own lisinopril; she already had it in her pill box.", "source": "took own lisinopril, had it in her pill box already", "goal": "G1" },
+            { "text": "Client walked to the dining room and back with her walker, about 120 feet, with one rest.", "source": "walked to the dining room and back w walker, ~120ft, one rest", "goal": "G2" }
+          ]
+        },
+        {
+          "title": "Client reports",
+          "sentences": [
+            { "text": "Client says she gets dizzy when she stands up fast, which may indicate orthostatic changes.", "source": "says dizzy when she stands up fast", "goal": null }
+          ]
+        },
+        {
+          "title": "Teaching and actions",
+          "sentences": [
+            { "text": "Staff told her to sit on the edge of the bed first before standing.", "source": "told her to sit on edge of bed first", "goal": null }
+          ]
+        },
+        {
+          "title": "Follow-up / handoff",
+          "sentences": [
+            { "text": "Client still needs a ride set up for her clinic appointment Thursday; case manager informed.", "source": "still needs ride set up for clinic appt thurs, told CM", "goal": "G3" }
+          ]
+        }
+      ]
+    },
+    "not_documented": [
+      "Did you check her blood pressure again after she stood up?"
+    ],
+    "teach_sheet": {
+      "en": [
+        "Before you stand up, sit on the edge of the bed for a moment first.",
+        "Keep taking your blood pressure pill from your pill box each morning.",
+        "Your clinic appointment is Thursday. The case manager is working on your ride."
+      ],
+      "es": [
+        "Antes de levantarse, siéntese un momento en el borde de la cama.",
+        "Siga tomando su pastilla para la presión de su pastillero cada mañana.",
+        "Su cita en la clínica es el jueves. El gestor de casos está organizando su transporte."
+      ]
+    }
+  },
+  "marcus": {
+    "note": {
+      "sections": [
+        {
+          "title": "Observed",
+          "sentences": [
+            { "text": "Temperature 98.4.", "source": "temp 98.4", "goal": "G2" },
+            { "text": "Client took his morning antibiotic himself; 4 pills left in the pack.", "source": "took AM antibiotic himself, 4 pills left in the pack", "goal": "G1" },
+            { "text": "Right arm redness looks smaller than yesterday; staff marked the edge with a pen again; no drainage.", "source": "R arm redness looks smaller than yesterday, marked edge w pen again, no drainage", "goal": "G2" }
+          ]
+        },
+        {
+          "title": "Client reports",
+          "sentences": [
+            { "text": "Client says the arm itches.", "source": "he says it itches", "goal": "G2" }
+          ]
+        },
+        {
+          "title": "Teaching and actions",
+          "sentences": [
+            { "text": "Staff told him not to scratch and to tell staff if the area gets hot or red past the line.", "source": "told him not to scratch and to tell us if it gets hot or red past the line", "goal": "G2" },
+            { "text": "Client asked about job help; staff told him the case manager can help.", "source": "asked about job stuff, told him CM can help", "goal": null }
+          ]
+        }
+      ]
+    },
+    "not_documented": [
+      "What time was the morning antibiotic taken?"
+    ],
+    "teach_sheet": {
+      "en": [
+        "Keep taking your antibiotic every morning until the pack is empty. You have 4 left.",
+        "Try not to scratch your arm.",
+        "Tell staff right away if the red area gets hot, or spreads past the pen line.",
+        "Ask the case manager about job help."
+      ],
+      "es": [
+        "Siga tomando su antibiótico cada mañana hasta que se acabe el paquete. Le quedan 4.",
+        "Trate de no rascarse el brazo.",
+        "Avise al personal de inmediato si la zona roja se calienta o pasa de la línea marcada.",
+        "Pregunte al gestor de casos sobre ayuda para encontrar trabajo."
+      ]
+    }
+  }
+}
