@@ -79,11 +79,11 @@
 
   <section class="hero">
     <div>
-      <h1>The shift on one screen.<br>You tap. You sign.</h1>
-      <p class="lede">Built with and for the LVNs and medical assistants at Illumination Health + Home. Med pass, med rec, handoff and notes, without typing into forms, and nothing that says something you didn't.</p>
+      <h1>Your shift.<br>One screen.</h1>
+      <p class="lede">Med pass, med rec, handoff, notes. You tap. You sign.</p>
       <div class="doors">
-        <button class="door" data-role="floor"><b>I'm on the floor</b><span>LVN or medical assistant. Your beds, your med pass, your notes.</span><span class="go">Open my floor →</span></button>
-        <button class="door" data-role="program"><b>I'm IHH staff</b><span>Program and site leads. Every site at a glance, red flags first.</span><span class="go">Open program view →</span></button>
+        <button class="door" data-role="floor"><b>I'm on the floor</b><span>LVN · medical assistant</span><span class="go">Open my floor →</span></button>
+        <button class="door" data-role="program"><b>I'm IHH staff</b><span>Every site at a glance</span><span class="go">Open program view →</span></button>
       </div>
     </div>
     <div class="mock" aria-hidden="true">
@@ -97,37 +97,37 @@
   </section>
 
   <section class="strip">
-    <div class="card"><h3>Who needs you now</h3><p>Beds colored like a restaurant floor: teal breathes for an open med pass, coral for a miss, green for caught up. Tap a bed to work it.</p></div>
-    <div class="card"><h3>Ordered vs. taken</h3><p>Drop Kipu's two exports in. Rounds matches them and shows missed doses, refused doses, and meds with no order, before a payer does.</p></div>
-    <div class="card"><h3>Nothing you didn't say</h3><p>Notes are drafted from your own jottings. Touch any line and the jotting it came from lights up. Anything added gets caught in red.</p></div>
+    <div class="card"><h3>Who needs you now</h3><p>Beds light up. Tap one.</p></div>
+    <div class="card"><h3>Ordered vs. taken</h3><p>Two Kipu exports in. Missed doses out. Before the payer asks.</p></div>
+    <div class="card"><h3>Nothing you didn't say</h3><p>Every line traces to your words. Anything added turns red.</p></div>
   </section>
 
-  <blockquote class="q">"If they took it and you didn't document it, the insurance company isn't going to pay."<small>IHH staff, describing why every med pass log matters. Rounds makes the log the tap itself.</small></blockquote>
+  <blockquote class="q">"If they took it and you didn't document it, the insurance company isn't going to pay."<small>IHH staff. In Rounds, the tap is the log.</small></blockquote>
 
   <section class="steps">
-    <div class="step"><i>1</i><div><b>Start your shift</b><span>Say your name. See the floor. The handoff from the last shift waits at the top until you've read it.</span></div></div>
-    <div class="step"><i>2</i><div><b>Work the beds</b><span>Med pass taps, vitals tiles, "they said," "I taught." Or say it: the mic understands "blood pressure 120 over 80 for Robert" and asks before it logs.</span></div></div>
-    <div class="step"><i>3</i><div><b>Sign and send</b><span>Your note in your words, copied into Kipu. A teach sheet for the client in English or Spanish. A handoff for the next shift.</span></div></div>
+    <div class="step"><i>1</i><div><b>Start</b><span>Your floor. Last shift's handoff on top.</span></div></div>
+    <div class="step"><i>2</i><div><b>Work the beds</b><span>Tap it or say it. "BP 120 over 80 for Robert."</span></div></div>
+    <div class="step"><i>3</i><div><b>Sign</b><span>Note to Kipu. Teach sheet to the client. Handoff to the night.</span></div></div>
   </section>
 
   <section class="trust"><ul>
-    <li>Everything stays on the device. Rounds never writes to Kipu, CalOptima or any IHH system.</li>
-    <li>Names and ID numbers are removed in the browser before any text is sent for drafting.</li>
-    <li>Every drafted line is checked against your words by a deterministic checker, not by trusting the model.</li>
-    <li>Open source (MIT), built at the Orange County Claude Impact Lab, October 17, 2026, donated to IHH.</li>
+    <li>Stays on the device. Never writes to Kipu.</li>
+    <li>Names stripped before anything is sent.</li>
+    <li>Drafts checked against your words, not trusted.</li>
+    <li>Open source. Built for IHH at the OC Claude Impact Lab.</li>
   </ul></section>
 
-  <footer>Demo with made-up clients and sites. Access codes below are for the demo only; production sign-in would use IHH's own accounts. <a href="https://github.com/shayant101/rounds">Source on GitHub</a></footer>
+  <footer>Demo · made-up clients · <a href="https://github.com/shayant101/rounds">Source</a></footer>
 </div>
 
 <div class="gate" id="gate" hidden>
   <div class="gatebox" role="dialog" aria-labelledby="gTitle">
     <h2 id="gTitle">Access code</h2>
-    <p id="gText">For the floor.</p>
+    <p id="gText"></p>
     <input type="text" id="gCode" inputmode="numeric" autocomplete="one-time-code" placeholder="••••" aria-label="access code">
     <div class="err" id="gErr"></div>
     <div class="btns"><button id="gCancel">Back</button><button class="main" id="gGo">Enter</button></div>
-    <div class="demo">Demo codes: floor <b>2468</b> · IHH staff <b>1357</b>. These are placeholders for a real sign-in.</div>
+    <div class="demo">Demo codes · floor <b>2468</b> · IHH staff <b>1357</b></div>
   </div>
 </div>
 
@@ -136,7 +136,7 @@
   const CODES={floor:'2468',program:'1357'}; const DEST={floor:'app/index.html',program:'program/index.html'};
   let role=null; const gate=document.getElementById('gate'), code=document.getElementById('gCode'), err=document.getElementById('gErr');
   const ok=r=>{ try{ return localStorage.getItem('rounds.access.'+r)==='1'; }catch(e){ return false; } };
-  document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{ role=b.dataset.role; if(ok(role)){ location.href=DEST[role]; return; } document.getElementById('gText').textContent=role==='floor'?'For LVNs and medical assistants.':'For IHH program and site staff.'; code.value=''; err.textContent=''; gate.hidden=false; code.focus(); });
+  document.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{ role=b.dataset.role; if(ok(role)){ location.href=DEST[role]; return; } document.getElementById('gText').textContent=role==='floor'?'Floor':'IHH staff'; code.value=''; err.textContent=''; gate.hidden=false; code.focus(); });
   document.getElementById('gCancel').onclick=()=>{ gate.hidden=true; };
   const go=()=>{ if(code.value.trim()===CODES[role]){ try{ localStorage.setItem('rounds.access.'+role,'1'); }catch(e){} location.href=DEST[role]; } else { err.textContent='That code didn\'t match.'; code.select(); } };
   document.getElementById('gGo').onclick=go; code.addEventListener('keydown',e=>{ if(e.key==='Enter') go(); if(e.key==='Escape') gate.hidden=true; });

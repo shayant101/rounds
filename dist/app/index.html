@@ -309,12 +309,12 @@
 
 <div class="wrap">
   <div id="hello" class="hello" hidden>
-    <h2>This is your rounds sheet.</h2>
-    <p>Tap what you did, the way you'd scribble it on paper. At the end, it writes the note in your words and you sign it. Nothing here leaves your phone except the words you choose to send. No names ever do.</p>
+    <h2>Your rounds.</h2>
+    <p>Tap what you did. It writes the note in your words. You sign.</p>
     <label for="nameIn" style="font-weight:800">What should it call you?</label>
     <input id="nameIn" type="text" placeholder="Your first name" autocomplete="given-name">
     <div class="row"><button class="go" id="startBtn" style="flex:1">Start my rounds</button></div>
-    <p style="font-size:14px">Try it first with a made-up client. Nothing real is in here.</p>
+    
   </div>
 
   <div id="app" hidden>
@@ -342,7 +342,7 @@
       </div>
       <div class="panel" id="medrecPanel">
         <div class="ph"><h2>Med rec</h2><span class="muted">ordered vs. taken, from Kipu's two exports</span></div>
-        <p class="muted" style="margin:0 0 10px;font-size:14px">Kipu can export what the doctor ordered and what was actually taken. Nobody has time to compare them by hand. Drop both here; nothing leaves this device.</p>
+        <p class="muted" style="margin:0 0 10px;font-size:14px">Kipu's two exports in. Missed doses out. Nothing leaves this device.</p>
         <div class="drops">
           <label class="drop"><span><b>Ordered</b><br><span class="muted" id="ordName">doctor's orders export (.csv)</span></span><input type="file" accept=".csv,text/csv" id="ordFile"></label>
           <label class="drop"><span><b>Taken</b><br><span class="muted" id="marName">administration / MAR export (.csv)</span></span><input type="file" accept=".csv,text/csv" id="marFile"></label>
@@ -362,7 +362,7 @@
       </div>
       <div class="panel" id="handoffPanel">
         <div class="ph"><h2>Hand off</h2><span class="muted">for the next shift</span></div>
-        <p class="muted" style="margin:0 0 10px;font-size:14px">It starts from what happened today. Add what only you know.</p>
+        <p class="muted" style="margin:0 0 10px;font-size:14px">Built from today. Add what only you know.</p>
         <div class="btns"><button class="btn main" id="prepHandoff">Prepare handoff</button></div>
         <div id="handoffOut"></div>
       </div>
@@ -384,11 +384,11 @@
       </section>
 
       <section class="draft sticky" id="draft">
-        <div class="empty">Your note shows up here, one line at a time. Touch a line and it points back to what you wrote.</div>
+        <div class="empty">Your note lands here. Touch a line to see where it came from.</div>
       </section>
     </div>
 
-    <p class="foot">Rounds keeps everything on this device. It never writes to Kipu or to CalOptima. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="resetLink">Start over</a></p>
+    <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="resetLink">Start over</a></p>
   </div>
 </div>
 <button class="mic" id="micBtn" aria-label="Tell Rounds what to log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
