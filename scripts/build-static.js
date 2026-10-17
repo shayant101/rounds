@@ -47,4 +47,6 @@ const landing = fs.readFileSync(path.join(root, 'public', 'landing.html'), 'utf8
 fs.writeFileSync(path.join(root, 'dist', 'index.html'), landing);
 const prog = fs.readFileSync(path.join(root, 'public', 'program.html'), 'utf8').replace('window.__CLIENTS__=null;/*CLIENTS*/', () => `window.__CLIENTS__=${clients};`).replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);
 fs.writeFileSync(path.join(root, 'dist', 'program', 'index.html'), prog);
-console.log('wrote dist/index.html (landing), dist/app/, dist/program/');
+fs.mkdirSync(path.join(root, 'dist', 'views'), { recursive: true });
+fs.writeFileSync(path.join(root, 'dist', 'views', 'index.html'), fs.readFileSync(path.join(root, 'public', 'views.html'), 'utf8').replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`));
+console.log('wrote dist/index.html (landing), dist/app/, dist/program/, dist/views/');

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Rounds · Three screens</title>
+<link rel="icon" href="icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0B0D0B;--ink:#F2F5F0;--ink-2:#A6AEA2;--teal:#81E40A;--rule:#2A2F29}
+  :root[data-theme="light"]{--bg:#F6F8F4;--ink:#0B0D0B;--ink-2:#5B655A;--rule:#DCE3D9}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:700 16px/1.4 "Nunito",system-ui,sans-serif}
+  .wrap{max-width:1500px;margin:0 auto;padding:16px}
+  .top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+  h1{font-size:26px;margin:0;font-weight:900} .top a{color:var(--teal);text-decoration:none;font-weight:900}
+  .seg{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{font:inherit;color:var(--ink);background:transparent;border:2px solid var(--rule);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:44px}
+  .seg button[aria-pressed="true"]{border-color:var(--teal);color:var(--teal)}
+  .stage{display:grid;gap:28px;justify-items:center;align-items:end}
+  @media(min-width:1200px){.stage{grid-template-columns:auto auto auto}}
+  .dev{display:grid;justify-items:center;gap:10px} .dev h2{margin:0;font-size:14px;color:var(--ink-2);font-weight:900;letter-spacing:.02em}
+  .frame{position:relative;background:#111;border-radius:28px;box-shadow:0 30px 70px rgba(0,0,0,.45);border:2px solid #2a2a2a;overflow:hidden}
+  .frame iframe{border:0;display:block;transform-origin:top left;background:#fff}
+  .laptop .frame{border-radius:16px 16px 4px 4px;border-width:10px;border-color:#1c1c1c}
+  .laptop .base{width:calc(100% + 80px);height:14px;background:linear-gradient(#2a2a2a,#151515);border-radius:0 0 14px 14px;margin-top:-10px}
+  .tablet .frame{border-width:14px;border-color:#1c1c1c;border-radius:30px}
+  .phone .frame{border-width:10px;border-color:#1c1c1c;border-radius:40px}
+  .phone .frame::after{content:"";position:absolute;left:50%;top:10px;transform:translateX(-50%);width:90px;height:22px;background:#1c1c1c;border-radius:12px}
+  .phone .frame iframe{margin-top:40px}
+  .note{color:var(--ink-2);font-size:14px;margin-top:18px;font-weight:700}
+</style></head>
+<body><div class="wrap">
+  <div class="top"><h1>Three screens</h1><a href="./">← Back</a>
+    <div class="seg" id="seg"><button data-p="app/" aria-pressed="true">Floor</button><button data-p="program/">Program view</button><button data-p="./">Landing</button></div></div>
+  <div class="stage">
+    <div class="dev laptop"><h2>Laptop</h2><div class="frame" id="f1"></div><div class="base"></div></div>
+    <div class="dev tablet"><h2>Tablet</h2><div class="frame" id="f2"></div></div>
+    <div class="dev phone"><h2>Phone</h2><div class="frame" id="f3"></div></div>
+  </div>
+  <p class="note">All three are the live app, same data on this device. Tap inside any of them.</p>
+</div>
+<script>
+(function(){
+  try{var t=localStorage.getItem("rounds.theme");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}
+  var D=[{el:'f1',w:1280,h:800,s:0.5},{el:'f2',w:820,h:1100,s:0.5},{el:'f3',w:390,h:804,s:0.62}];
+  var path='app/';
+  function fit(){ var vw=Math.min(window.innerWidth-32,1468); var total=1280*0.5+820*0.5+390*0.62+56; var k=Math.min(1,vw/total); if(window.innerWidth<1200)k=Math.min(1,(window.innerWidth-32)/ (1280*0.5)); D.forEach(function(d){var el=document.getElementById(d.el); var s=d.s*k; el.style.width=(d.w*s)+'px'; el.style.height=(d.h*s)+'px'; var f=el.querySelector('iframe'); if(f){f.style.width=d.w+'px';f.style.height=d.h+'px';f.style.transform='scale('+s+')';}}); }
+  function load(){ D.forEach(function(d){var el=document.getElementById(d.el); el.innerHTML='<iframe src="../'+path+'" title="'+d.el+'"></iframe>';}); fit(); }
+  document.querySelectorAll('[data-p]').forEach(function(b){b.onclick=function(){path=b.dataset.p==='./'?'':b.dataset.p; document.querySelectorAll('[data-p]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));}); load();};});
+  window.addEventListener('resize',fit); load();
+})();
+</script></body></html>

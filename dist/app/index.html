@@ -283,6 +283,13 @@
   /* first run */
   .hello{background:var(--paper);border-radius:var(--r);padding:20px;margin:16px 0;display:grid;gap:12px}
   .hello h2{margin:0;font-size:24px;font-weight:800}
+  .staff{display:grid;gap:8px}
+  @media(min-width:560px){.staff{grid-template-columns:repeat(3,1fr)}}
+  .person{display:flex;align-items:center;gap:12px;padding:12px;border:3px solid var(--rule);border-radius:var(--r);background:var(--mist);color:var(--ink);text-align:left;min-height:64px}
+  .person:hover,.person:focus-visible{border-color:var(--teal)}
+  .person .av{width:44px;height:44px;border-radius:50%;background:var(--teal);color:var(--on-teal);display:grid;place-items:center;font-weight:900;font-size:16px;flex:none}
+  .person b{display:block;font-size:17px}
+  .person span{color:var(--ink-2);font-size:13px}
   .hello p{margin:0;color:var(--ink-2)}
   .hello input{height:52px;border:2px solid var(--rule);border-radius:var(--r-sm);padding:0 14px;background:var(--mist);font-size:20px;font-weight:700;width:100%}
   .hello .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -309,11 +316,11 @@
 
 <div class="wrap">
   <div id="hello" class="hello" hidden>
-    <h2>Your rounds.</h2>
-    <p>Tap what you did. It writes the note in your words. You sign.</p>
-    <label for="nameIn" style="font-weight:800">What should it call you?</label>
-    <input id="nameIn" type="text" placeholder="Your first name" autocomplete="given-name">
-    <div class="row"><button class="go" id="startBtn" style="flex:1">Start my rounds</button></div>
+    <h2>Who's on?</h2>
+    <p>Tap your name to start your shift.</p>
+    <div class="staff" id="staff"></div>
+    <div class="row" style="align-items:center;justify-content:space-between"><span class="muted" style="font-size:13px">Demo staff. Real sign-in would be IHH's accounts.</span><button class="themeBtn" id="themeBtn2" aria-label="Switch light and dark" title="Light / dark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+  </div>
     
   </div>
 
@@ -388,7 +395,7 @@
       </section>
     </div>
 
-    <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="resetLink">Start over</a></p>
+    <p class="foot">Stays on this device. Never writes to Kipu. <a href="../program/index.html">Program view for IHH staff</a> · <a href="#" id="switchLink">Switch person</a> · <a href="#" id="resetLink">Start over</a></p>
   </div>
 </div>
 <button class="mic" id="micBtn" aria-label="Tell Rounds what to log"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
@@ -968,12 +975,14 @@
   // ---- boot
   fetch('/api/clients').then(r=>r.json()).then(d=>{S.clients=d.clients; boot();});
   function boot(){
-    if(!S.profile){ $('#hello').hidden=false; $('#startBtn').onclick=()=>{ const n=$('#nameIn').value.trim(); S.profile={name:n||'there'}; store.set('profile',S.profile); $('#hello').hidden=true; showApp(true); }; $('#nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('#startBtn').click()}); }
+    const STAFF=[{name:'Maria',full:'Maria Lopez',role:'LVN · day shift'},{name:'James',full:'James Okafor',role:'Medical assistant · day shift'},{name:'Priya',full:'Priya Nair',role:'LVN · night shift'}];
+    if(!S.profile){ $('#hello').hidden=false; $('#staff').innerHTML=STAFF.map(p=>`<button class="person" data-staff="${esc(p.name)}"><span class="av">${esc(p.full.split(' ').map(w=>w[0]).join(''))}</span><span><b>${esc(p.full)}</b><span>${esc(p.role)}</span></span></button>`).join('');
+      $('#staff').querySelectorAll('[data-staff]').forEach(b=>b.onclick=()=>{ const p=STAFF.find(x=>x.name===b.dataset.staff); S.profile={name:p.name,full:p.full,role:p.role}; store.set('profile',S.profile); $('#hello').hidden=true; showApp(true); }); }
     else showApp(false);
   }
   function showApp(first){
     $('#app').hidden=false;
-    $('#greet').textContent=`${greetWord}, ${S.profile.name}`;
+    $('#greet').textContent=`${greetWord}, ${S.profile.name}`; if(S.profile.role) $('#sub').title=S.profile.role;
     renderBoard(); goHome();
     if(first) toast('Start with the med pass. Tap a room when you want to write it up.');
   }
@@ -1233,6 +1242,7 @@
 
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
   $('#teamBtn').onclick=()=>showDraft('team'); $('#auditBtn').onclick=()=>showDraft('audit');
+  $('#switchLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');}catch(_){} location.reload();};
   $('#resetLink').onclick=e=>{e.preventDefault(); try{localStorage.removeItem('rounds.profile');localStorage.removeItem('rounds.done');}catch(_){} location.reload();};
 
   function renderBoard(){
