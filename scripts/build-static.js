@@ -42,7 +42,8 @@ let out = html
   .replace(/<link rel="apple-touch-icon" href="icon.svg">/, '');
 fs.mkdirSync(path.join(root, 'dist', 'app'), { recursive: true }); fs.mkdirSync(path.join(root, 'dist', 'brand'), { recursive: true }); fs.readdirSync(path.join(root, 'public', 'brand')).forEach(f => fs.copyFileSync(path.join(root, 'public', 'brand', f), path.join(root, 'dist', 'brand', f))); fs.mkdirSync(path.join(root, 'dist', 'program'), { recursive: true });
 
-out = out.split('brand/').join('../brand/');
+const b64=f=>'data:image/png;base64,'+fs.readFileSync(path.join(root,'public','brand',f)).toString('base64');
+out = out.split('brand/mark-grey.png').join(b64('mark-grey-128.png')).split('brand/mark-black.png').join(b64('mark-black-128.png')).split('brand/').join('../brand/');
 fs.writeFileSync(path.join(root, 'dist', 'app', 'index.html'), out);
 const landing = fs.readFileSync(path.join(root, 'public', 'landing.html'), 'utf8').replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);
 fs.writeFileSync(path.join(root, 'dist', 'index.html'), landing);
