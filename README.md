@@ -105,6 +105,21 @@ npm start
 
 Run the checks on all samples: `npm run eval` (writes `eval/results.md`).
 
+### Voice (optional keys)
+
+The mic button works with no keys (the browser's own speech recognition, English). Two optional keys make it better:
+
+| Key | What it adds | Where it runs |
+|---|---|---|
+| `ASSEMBLYAI_API_KEY` | The "private line": AssemblyAI streaming, `universal-streaming-multilingual` with Medical Mode (`domain=medical-v1`), English + Spanish, the floor's client names and meds as keyterms. The browser gets a 60-second token from `/api/voice-token`; the key never reaches the device. Billed per open second, so the socket closes after each command. | [`server/voice.js`](server/voice.js), [`api/voice-token.js`](api/voice-token.js) |
+| `ANTHROPIC_API_KEY` | When the on-device parser can't read a sentence (odd phrasing, Spanish), Claude maps it onto one of the same fixed actions. Any number in Claude's answer must appear in what was heard, unknown clients are dropped, and the card says "Read with help from Claude" — nothing happens until the nurse taps Do it. | [`server/voice.js`](server/voice.js), [`api/voice-parse.js`](api/voice-parse.js) |
+
+Locally: put them in `.env`. On Vercel: Project → Settings → Environment Variables, then redeploy. Without them, both routes answer `{"configured":false}` and the app falls back quietly.
+
+Spoken replies are eight recorded clips in `public/sounds/` ("Done", "Listo", "Sorry, I didn't catch that", "Which client?", "Cancelled", in English and Spanish), made once with an ElevenLabs voice. They play on the device; no client detail is ever spoken. "Sound on/off" is in the voice bar.
+
+Before real client audio goes to either service, IHH needs a signed BAA with AssemblyAI and with Anthropic (HIPAA configuration).
+
 ## What is real and what is mocked
 
 | Part | Status |
@@ -115,6 +130,8 @@ Run the checks on all samples: `npm run eval` (writes `eval/results.md`).
 | Care plan goal linking, "not in your jottings" questions, bilingual teach sheet | working (live) / hand-written (demo mode) |
 | Claude drafting | working when `ANTHROPIC_API_KEY` is set; **demo mode uses hand-written outputs** for the three sample clients, written to imitate real model output including one added sentence and one interpretation so the checks can be seen working |
 | Clients and care plan goals | made up; three samples |
+| Voice: private line (AssemblyAI) and Claude understanding | code working and tested with a simulated socket and mocked replies; **not yet tested with real keys or real floor audio** |
+| Voice clips | real recordings (ElevenLabs voice), checked with a transcriber |
 | Kipu integration | none, by design. Output is text you paste. Rounds never reads or writes IHH systems |
 | Med pass log, due-today ticks, flags, name | stored in the browser only, per day |
 | Pass times, med names, appointments, MRNs | made up for the three sample clients |

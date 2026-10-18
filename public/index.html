@@ -242,6 +242,7 @@
   .vbar{position:relative;width:100%;max-width:720px;background:color-mix(in srgb,var(--paper) 78%,transparent);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);border:1px solid color-mix(in srgb,var(--ink) 12%,transparent);border-radius:28px;box-shadow:0 18px 50px rgba(0,0,0,.25);padding:14px 16px 12px;display:grid;gap:8px;overflow:hidden}
   .vhd{display:flex;align-items:center;justify-content:space-between} .vhd b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:800}
   .vhd .sm{background:transparent;color:var(--ink-2);border:0;width:36px;height:36px;border-radius:50%;font-size:16px;min-height:0}
+  .vhd #vSound{width:auto;padding:0 12px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;border:1px solid color-mix(in srgb,var(--ink) 14%,transparent)} .vhd #vSound[aria-pressed="false"]{opacity:.6}
   .vheard{font:600 clamp(17px,2.4vw,22px)/1.3 var(--note);color:var(--ink);min-height:1.3em;text-wrap:balance}
   .vheard:not(.quote){font:500 15px/1.45 var(--ui);color:var(--ink-2)}
   .vheard.quote{font-style:italic}
@@ -458,7 +459,7 @@
 <div class="voice" id="voice" hidden role="dialog" aria-label="Voice">
   <div id="vPlan" style="width:100%;display:grid;justify-items:center"></div>
   <div class="vbar">
-    <div class="vhd"><b id="vTitle">Listening…</b><button class="sm" id="vClose" aria-label="close">✕</button></div>
+    <div class="vhd"><b id="vTitle">Listening…</b><span style="display:flex;gap:6px"><button class="sm" id="vSound" aria-pressed="true" title="Short spoken confirmations">Sound on</button><button class="sm" id="vClose" aria-label="close">✕</button></span></div>
     <div class="vheard" id="vHeard">Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".</div>
     <canvas class="vwave" id="vWave" aria-hidden="true"></canvas>
     <div class="chips vquick" id="vQuick"><span class="muted" style="font-size:12px;font-weight:800;align-self:center">Try:</span><button class="chip small" data-say="blood pressure 120 over 80 for Robert">BP 120/80 for Robert</button><button class="chip small" data-say="Dolores took her meds">Dolores took her meds</button><button class="chip small" data-say="flag Marcus for a doctor">Flag Marcus for a doctor</button></div>
@@ -786,9 +787,9 @@
     vPlan.innerHTML=`<div class="plan ${p.kind==='unsure'||needC?'unsure':''}"><div class="what">${esc(p.what)}</div><div class="who">${p.c?'for '+esc(p.c.display):needC?'Who is this for? Tap a name:':''}</div>
       ${needC?`<div class="chips" style="margin:4px 0 6px">${cands.map(c=>`<button class="chip small" data-who="${c.id}">${esc(c.display.split(' · ')[0])} · ${esc(c.display.split(' · ')[1].replace('Room ','Rm '))}</button>`).join('')}</div>`:''}
       ${p.kind!=='unsure'&&!needC?`<div class="btns"><button class="btn main" id="vDo">Do it</button><button class="btn" id="vNo">No</button></div>`:`<div class="btns"><button class="btn" id="vAgain">Try again</button></div>`}
-      <div class="muted" style="font-size:12px">Nothing happens until you tap. Rounds only does the actions it understood.</div></div>`;
-    const d=$('#vDo'); if(d) d.onclick=()=>{ act(p); vPlan.innerHTML=''; closeVoice(); };
-    const n=$('#vNo'); if(n) n.onclick=()=>{ vPlan.innerHTML=''; startListen(); };
+      <div class="muted" style="font-size:12px">${p.helped?'Read with help from Claude. Check it before you tap. ':''}Nothing happens until you tap. Rounds only does the actions it understood.</div></div>`;
+    const d=$('#vDo'); if(d) d.onclick=()=>{ act(p); say('done',p.lang); vPlan.innerHTML=''; closeVoice(); };
+    const n=$('#vNo'); if(n) n.onclick=()=>{ say('cancel',p.lang); vPlan.innerHTML=''; startListen(); };
     const a=$('#vAgain'); if(a) a.onclick=()=>{ vPlan.innerHTML=''; startListen(); };
     vPlan.querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ const c=S.clients.find(x=>x.id===b.dataset.who); showPlan(Object.assign({},p,{c})); });
   }
@@ -821,29 +822,154 @@
       ctx.globalAlpha=1; ctx.shadowBlur=0;
       ctx.globalCompositeOperation='source-over'; raf=requestAnimationFrame(draw); }
     async function listenAudio(){ try{ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return; stream=await navigator.mediaDevices.getUserMedia({audio:true}); ac=new (window.AudioContext||window.webkitAudioContext)(); an=ac.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6; buf=new Uint8Array(an.fftSize); ac.createMediaStreamSource(stream).connect(an); }catch(e){ an=null; } }
-    return { start(){ if(!cv) return; ctx=cv.getContext('2d'); size(); window.addEventListener('resize',size); cancelAnimationFrame(raf); if(matchMedia('(prefers-reduced-motion: reduce)').matches){ level=0.15; draw(); cancelAnimationFrame(raf); return; } draw(); listenAudio(); },
+    return { start(noMic){ if(!cv) return; ctx=cv.getContext('2d'); size(); window.addEventListener('resize',size); cancelAnimationFrame(raf); if(matchMedia('(prefers-reduced-motion: reduce)').matches){ level=0.15; draw(); cancelAnimationFrame(raf); return; } draw(); if(!noMic) listenAudio(); },
+      mic(){ an=null; if(!stream) listenAudio(); },
+      // the private line already has the mic open; read its level instead of opening the mic twice (iOS dislikes two captures)
+      useAnalyser(a){ an=a; buf=new Uint8Array(a.fftSize); },
       stop(){ cancelAnimationFrame(raf); window.removeEventListener('resize',size); if(stream){ stream.getTracks().forEach(tr=>tr.stop()); stream=null; } if(ac){ try{ac.close();}catch(e){} ac=null; } an=null; if(ctx) ctx.clearRect(0,0,cv.width,cv.height); } }; })();
+
+  // ---- speaking: short recorded clips (made once with an ElevenLabs voice), played on the device. No live speech model,
+  // nothing about a client is ever spoken aloud. Sound can be turned off from the voice bar.
+  const SOUND={on:(()=>{ try{ return localStorage.getItem('rounds.voiceSound')!=='off'; }catch(e){ return true; } })()};
+  const CLIPS=['done','again','which','cancel'], clipEl={};
+  function clip(name,lang){ const src='sounds/'+name+'-'+(lang==='es'?'es':'en')+'.mp3'; return clipEl[src]||(clipEl[src]=Object.assign(new Audio(src),{preload:'auto'})); }
+  function say(name,lang){ if(!SOUND.on||!name) return; try{ const a=clip(name,lang); a.muted=false; a.currentTime=0; const pr=a.play(); if(pr&&pr.catch) pr.catch(()=>{}); window.__roundsLastSaid=name+'-'+(lang==='es'?'es':'en'); }catch(e){} }
+  // iOS only lets a page play sound it started inside a tap; "unlock" every clip on the mic tap so later cues can play.
+  function unlockClips(){ if(!SOUND.on) return; ['en','es'].forEach(l=>CLIPS.forEach(n=>{ try{ const a=clip(n,l); a.muted=true; const pr=a.play(); if(pr&&pr.then) pr.then(()=>{ a.pause(); a.currentTime=0; a.muted=false; }).catch(()=>{ a.muted=false; }); }catch(e){} })); }
+  function renderSoundBtn(){ const b=$('#vSound'); if(!b) return; b.setAttribute('aria-pressed',String(SOUND.on)); b.textContent=SOUND.on?'Sound on':'Sound off'; }
+  const guessLang=t=>/[ñ¿¡áéíóú]|\b(tomó|tomo|presión|azúcar|azucar|no vino|médico|medico|listo|cliente|dijo|se siente|mareo|náusea|caminó|camino|pies)\b/i.test(String(t||''))?'es':'en';
+  // ---- understanding: the regex parser first (instant, on device). Only when it can't read the sentence (odd phrasing,
+  // Spanish) is the sentence sent to Claude, which may only pick one of the same fixed actions. Numbers must match what was heard.
+  let smartOK=null, decideSeq=0;
+  async function understand(raw){
+    if(smartOK===false) return null;
+    try{
+      const r=await fetch('/api/voice-parse/',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text:raw,digits:words2num(fold(raw)),openPass:latestOpen(),
+        clients:S.clients.map(c=>({id:c.id,name:c.display.split(' · ')[0],aliases:c.names||[],room:(c.display.match(/Room (\d+)/)||[])[1]||''}))})});
+      if(r.status===503||r.status===404||r.status===405){ smartOK=false; return null; }
+      if(!r.ok) return null; const j=await r.json(); if(j.configured===false){ smartOK=false; return null; } smartOK=true; return fromAction(j.action);
+    }catch(e){ return null; }
+  }
+  function fromAction(a){
+    if(!a) return null; const c=a.clientId?S.clients.find(x=>x.id===a.clientId):null, cc=c||S.client, cur=latestOpen(); let p=null;
+    switch(a.kind){
+      case 'vital': p=a.vital==='bp'?{kind:'line',c:cc,text:'BP '+a.value,what:'Log blood pressure '+a.value,vitals:true}
+        :a.vital==='sugar'?{kind:'line',c:cc,text:'blood sugar '+a.value+(a.context?' '+a.context:''),what:'Log blood sugar '+a.value+(a.context?' '+a.context:''),vitals:true}
+        :{kind:'line',c:cc,text:'temp '+a.value,what:'Log temperature '+a.value,vitals:true}; break;
+      case 'walked': p={kind:'line',c:cc,text:`walked ${a.feet} ft`,what:`Log walked ${a.feet} ft`}; break;
+      case 'pass': p=cur?{kind:'pass',c:cc,status:a.status,note:a.note||undefined,what:`Log ${cur} med pass: `+({took:'took it, watched',missed:"didn't come",side:'side effect'+(a.note?' ('+a.note+')':'')}[a.status])}:{kind:'unsure',what:'No med pass is open right now'}; break;
+      case 'flag': p={kind:'flag',c:cc,flag:a.flag,what:{doctor:'Flag: a doctor should look',ready:'Flag: ready to move out soon',vitals:'Tick vitals done'}[a.flag]}; break;
+      case 'says': p={kind:'line',c:cc,text:'says '+a.text,what:`Add to sheet: "says ${a.text}"`}; break;
+      case 'taught': p={kind:'line',c:cc,text:'taught '+a.text,what:`Add to sheet: "taught ${a.text}"`}; break;
+      case 'note': p={kind:'line',c:cc,text:a.text,what:`Add to sheet: "${a.text}"`}; break;
+      case 'open': p=c?{kind:'open',c,what:'Open '+c.display}:{kind:'unsure',what:'Which client?'}; break;
+      case 'handoff': p={kind:'handoff',what:'Prepare the shift handoff'}; break;
+      case 'audit': p={kind:'audit',what:"Show what's still missing"}; break;
+      default: p={kind:'unsure',what:"Didn't understand that one"};
+    }
+    p.helped=true; return p;
+  }
+  async function decide(raw,lang){
+    const seq=++decideSeq; lastRaw=raw; lang=lang||guessLang(raw);
+    let p=parse(raw);
+    if(p.kind==='unsure'&&raw&&smartOK!==false){
+      vPlan.innerHTML='<div class="plan"><div class="what">Working out what you meant…</div></div>';
+      const q=await understand(raw); if(seq!==decideSeq) return; // a newer sentence or a close happened meanwhile
+      if(q&&q.kind!=='unsure') p=q;
+    }
+    p.lang=lang; vTitle.textContent='Heard'; showPlan(p);
+    const needC=['line','pass','flag'].includes(p.kind)&&!p.c;
+    say(p.kind==='unsure'?'again':needC?'which':null, lang);
+    window.__roundsVoice={engine:Cloud.engine,heard:raw,lang,plan:{kind:p.kind,what:p.what,client:p.c&&p.c.id,helped:!!p.helped}};
+  }
+
+  // ---- listening. First choice: the private line (AssemblyAI streaming, medical mode, English + Spanish, the floor's names and
+  // meds as hints) through a 60-second token from our server, so no key is on the device. If that isn't set up, the browser's own
+  // speech recognition is used as before. Either way it only produces text; nothing is logged until "Do it".
+  const Cloud={state:null, engine:'none'}; let cl=null;
+  function keyterms(){ const s=new Set(); S.clients.forEach(c=>{ s.add(c.display.split(' · ')[0]); (c.names||[]).forEach(n=>s.add(n)); (c.meds||[]).forEach(m=>s.add(m)); });
+    ['blood pressure','blood sugar','med pass','presión','azúcar'].forEach(t=>s.add(t)); return [...s].filter(Boolean).slice(0,100); }
+  const PCM_WORKLET=`class P extends AudioWorkletProcessor{constructor(){super();this.r=sampleRate/16000;this.p=0;this.a=0;this.n=0;this.b=[];}
+    process(i){const ch=i[0]&&i[0][0];if(ch){for(let k=0;k<ch.length;k++){this.a+=ch[k];this.n++;this.p++;if(this.p>=this.r){this.p-=this.r;this.b.push(this.a/this.n);this.a=0;this.n=0;}}
+    if(this.b.length>=800){const o=new Int16Array(this.b.length);for(let k=0;k<this.b.length;k++){const s=Math.max(-1,Math.min(1,this.b[k]));o[k]=s<0?s*32768:s*32767;}this.port.postMessage(o.buffer,[o.buffer]);this.b=[];}}return true;}}
+    registerProcessor('rounds-pcm',P);`;
+  async function startCloud(){
+    if(Cloud.state==='off'||!window.WebSocket||!navigator.mediaDevices) return false;
+    let tok=null;
+    try{ const r=await fetch('/api/voice-token/',{cache:'no-store'}); if(!r.ok){ if(r.status===503||r.status===404||r.status===405) Cloud.state='off'; return false; } const j=await r.json(); if(j.configured===false){ Cloud.state='off'; return false; } tok=j.token; }catch(e){ Cloud.state='off'; return false; }
+    if(!tok) return false;
+    const s={ws:null,ac:null,stream:null,queue:[],open:false,done:false,text:'',lang:null,timer:null,endTimer:null};
+    cl=s;
+    try{
+      s.stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+      s.ac=new (window.AudioContext||window.webkitAudioContext)(); if(s.ac.state==='suspended') await s.ac.resume();
+      const src=s.ac.createMediaStreamSource(s.stream); const an=s.ac.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6; src.connect(an); wave.useAnalyser(an);
+      const send=buf=>{ if(s.done) return; if(s.open&&s.ws.readyState===1) s.ws.send(buf); else s.queue.push(buf); };
+      if(s.ac.audioWorklet){ const url=URL.createObjectURL(new Blob([PCM_WORKLET],{type:'application/javascript'})); await s.ac.audioWorklet.addModule(url); URL.revokeObjectURL(url);
+        const node=new AudioWorkletNode(s.ac,'rounds-pcm'); node.port.onmessage=e=>send(e.data); src.connect(node); const mute=s.ac.createGain(); mute.gain.value=0; node.connect(mute); mute.connect(s.ac.destination); }
+      else { const sp=s.ac.createScriptProcessor(4096,1,1), r=s.ac.sampleRate/16000; let p=0,a=0,n=0,b=[];
+        sp.onaudioprocess=e=>{ const ch=e.inputBuffer.getChannelData(0); for(let k=0;k<ch.length;k++){ a+=ch[k]; n++; p++; if(p>=r){ p-=r; b.push(a/n); a=0; n=0; } }
+          if(b.length>=800){ const o=new Int16Array(b.length); b.forEach((v,k)=>{ const x=Math.max(-1,Math.min(1,v)); o[k]=x<0?x*32768:x*32767; }); send(o.buffer); b=[]; } };
+        src.connect(sp); const mute=s.ac.createGain(); mute.gain.value=0; sp.connect(mute); mute.connect(s.ac.destination); }
+    }catch(e){ stopCloud(); if(e&&e.name==='NotAllowedError'){ micBlocked(); return 'handled'; } return false; }
+    const q=new URLSearchParams({token:tok,speech_model:'universal-streaming-multilingual',sample_rate:'16000',encoding:'pcm_s16le',format_turns:'true',language_detection:'true',domain:'medical-v1',keyterms_prompt:JSON.stringify(keyterms())});
+    return await new Promise(resolve=>{
+      let opened=false;
+      try{ s.ws=new WebSocket('wss://streaming.assemblyai.com/v3/ws?'+q.toString()); s.ws.binaryType='arraybuffer'; }catch(e){ stopCloud(); return resolve(false); }
+      s.ws.onopen=()=>{ opened=true; s.open=true; Cloud.engine='private-line'; listening=true; $('#micBtn').classList.add('on'); vTitle.textContent='Listening…'; s.queue.splice(0).forEach(b=>s.ws.send(b));
+        s.timer=setTimeout(()=>finishCloud(true),15000); resolve(true); };
+      s.ws.onmessage=ev=>{ let m; try{ m=JSON.parse(ev.data); }catch(e){ return; }
+        if(m.type==='Turn'){ const live=(m.words&&m.words.length)?m.words.map(w=>w.text).join(' '):m.transcript; if(live){ s.text=m.transcript||live; vHeard.textContent='“'+live+'”'; vHeard.classList.add('quote'); }
+          if(m.language_code) s.lang=m.language_code;
+          if(m.end_of_turn&&m.transcript){ s.text=m.transcript; clearTimeout(s.endTimer); if(m.turn_is_formatted) finishCloud(); else s.endTimer=setTimeout(()=>finishCloud(),900); } }
+        else if(m.type==='Termination'){ /* closed cleanly */ }
+        else if(m.error){ if(!opened){ stopCloud(); resolve(false); } } };
+      s.ws.onerror=()=>{ if(!opened){ stopCloud(); resolve(false); } };
+      s.ws.onclose=()=>{ if(!opened){ stopCloud(); resolve(false); } else if(!s.done) finishCloud(true); };
+    });
+  }
+  function finishCloud(timedOut){
+    const s=cl; if(!s||s.done) return; s.done=true; clearTimeout(s.timer); clearTimeout(s.endTimer);
+    const text=(s.text||'').trim(), lang=s.lang&&/^es/.test(s.lang)?'es':(s.lang?'en':null);
+    stopCloud(); stopListen();
+    if(text){ vHeard.textContent='“'+text+'”'; vHeard.classList.add('quote'); decide(text,lang); }
+    else if(timedOut){ vTitle.textContent='Couldn\'t hear'; vHeard.classList.remove('quote'); vHeard.textContent='Tap an example below, or type it.'; say('again','en'); }
+  }
+  function stopCloud(){ const s=cl; if(!s) return; cl=null; s.done=true;
+    try{ if(s.ws&&s.ws.readyState===1){ s.ws.send(JSON.stringify({type:'Terminate'})); setTimeout(()=>{ try{s.ws.close();}catch(e){} },400); } else if(s.ws&&s.ws.readyState===0){ s.ws.close(); } }catch(e){}
+    if(s.stream) s.stream.getTracks().forEach(t=>t.stop()); if(s.ac){ try{s.ac.close();}catch(e){} } }
+  function micBlocked(){ vTitle.textContent='Mic is blocked'; vHeard.classList.remove('quote'); vHeard.textContent='Microphone is blocked for this page. Tap an example below, or type it.'; stopListen(); $('#vText').focus(); }
+
   let noSpeechRetried=false, finalTimer=null;
-  function startListen(){
+  async function startListen(){
+    vTitle.textContent='Listening…';
+    const c=await startCloud(); if(c===true||c==='handled') return;
+    if(vBox.hidden) return; // closed while we were connecting
+    startBrowser();
+  }
+  function startBrowser(){
+    wave.mic();
     if(!SR){ vTitle.textContent='Type what you\'d say'; vHeard.textContent='This browser has no speech recognition. Typing works the same way.'; $('#vText').focus(); return; }
     try{ rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=3; let heard='';
-      rec.onstart=()=>{ listening=true; $('#micBtn').classList.add('on'); vTitle.textContent='Listening…'; };
+      rec.onstart=()=>{ listening=true; Cloud.engine='browser'; $('#micBtn').classList.add('on'); vTitle.textContent='Listening…'; };
       rec.onresult=e=>{ let t=''; for(const r of e.results) t+=r[0].transcript; heard=t; lastRaw=t; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); clearTimeout(finalTimer);
-        if(e.results[e.results.length-1].isFinal){ showPlan(parse(t)); try{rec.stop();}catch(_){} }
-        else finalTimer=setTimeout(()=>{ if(heard){ showPlan(parse(heard)); try{rec.stop();}catch(_){} } },1400); };
-      rec.onerror=e=>{ if(e.error==='no-speech'&&!noSpeechRetried){ noSpeechRetried=true; vTitle.textContent='Still listening…'; setTimeout(startListen,150); return; }
+        if(e.results[e.results.length-1].isFinal){ decide(t); try{rec.stop();}catch(_){} }
+        else finalTimer=setTimeout(()=>{ if(heard){ decide(heard); try{rec.stop();}catch(_){} } },1400); };
+      rec.onerror=e=>{ if(e.error==='no-speech'&&!noSpeechRetried){ noSpeechRetried=true; vTitle.textContent='Still listening…'; setTimeout(startBrowser,150); return; }
         if(e.error==='aborted') return;
-        vTitle.textContent=e.error==='not-allowed'?'Mic is blocked':'Couldn\'t hear'; vHeard.classList.remove('quote'); vHeard.textContent=(e.error==='not-allowed'?'Microphone is blocked for this page. Tap an example below, or type it.':'Tap an example below, or type it.'); stopListen(); $('#vText').focus(); };
+        if(e.error==='not-allowed'){ micBlocked(); return; }
+        vTitle.textContent='Couldn\'t hear'; vHeard.classList.remove('quote'); vHeard.textContent='Tap an example below, or type it.'; stopListen(); $('#vText').focus(); };
       rec.onend=()=>stopListen();
       rec.start();
     }catch(e){ vTitle.textContent='Type what you\'d say'; }
   }
   function stopListen(){ listening=false; $('#micBtn').classList.remove('on'); }
-  function closeVoice(){ vBox.hidden=true; wave.stop(); if(rec){ try{rec.stop();}catch(e){} } stopListen(); }
-  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } vBox.hidden=false; wave.start(); noSpeechRetried=false; vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".'; $('#vText').value=''; startListen(); };
+  function closeVoice(){ decideSeq++; vBox.hidden=true; stopCloud(); wave.stop(); if(rec){ try{rec.stop();}catch(e){} } stopListen(); }
+  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } unlockClips(); renderSoundBtn(); vBox.hidden=false; wave.start(true); noSpeechRetried=false; vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor". English or Spanish.'; $('#vText').value=''; startListen(); };
   $('#vClose').onclick=closeVoice; vBox.addEventListener('click',e=>{ if(e.target===vBox) closeVoice(); });
-  const typed=()=>{ const t=$('#vText').value.trim(); if(!t) return; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); showPlan(parse(t)); };
-  document.querySelectorAll('#vQuick [data-say]').forEach(b=>b.onclick=()=>{ if(rec){try{rec.stop();}catch(_){}} $('#vText').value=b.dataset.say; typed(); });
+  $('#vSound').onclick=()=>{ SOUND.on=!SOUND.on; try{ localStorage.setItem('rounds.voiceSound',SOUND.on?'on':'off'); }catch(e){} renderSoundBtn(); if(SOUND.on){ unlockClips(); } };
+  const typed=()=>{ const t=$('#vText').value.trim(); if(!t) return; stopCloud(); if(rec){try{rec.stop();}catch(_){}} stopListen(); vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); decide(t); };
+  document.querySelectorAll('#vQuick [data-say]').forEach(b=>b.onclick=()=>{ $('#vText').value=b.dataset.say; typed(); });
   $('#vGo').onclick=typed; $('#vText').addEventListener('keydown',e=>{ if(e.key==='Enter') typed(); });
 
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }

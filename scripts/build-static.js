@@ -45,6 +45,8 @@ fs.mkdirSync(path.join(root, 'dist', 'app'), { recursive: true }); fs.mkdirSync(
 const b64=f=>'data:image/png;base64,'+fs.readFileSync(path.join(root,'public','brand',f)).toString('base64');
 out = out.split('brand/mark-grey.png').join(b64('mark-grey-128.png')).split('brand/mark-black.png').join(b64('mark-black-128.png')).split('brand/').join('../brand/');
 fs.writeFileSync(path.join(root, 'dist', 'app', 'index.html'), out);
+// voice confirmation clips ("Done", "Listo", ...) sit next to the app page
+fs.mkdirSync(path.join(root, 'dist', 'app', 'sounds'), { recursive: true }); fs.readdirSync(path.join(root, 'public', 'sounds')).forEach(f => fs.copyFileSync(path.join(root, 'public', 'sounds', f), path.join(root, 'dist', 'app', 'sounds', f)));
 const landing = fs.readFileSync(path.join(root, 'public', 'landing.html'), 'utf8').replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);
 fs.writeFileSync(path.join(root, 'dist', 'index.html'), landing);
 const prog = fs.readFileSync(path.join(root, 'public', 'program.html'), 'utf8').replace('window.__CLIENTS__=null;/*CLIENTS*/', () => `window.__CLIENTS__=${clients};`).replace(/<link rel="icon" href="icon.svg">/, `<link rel="icon" href="data:image/svg+xml,${encodeURIComponent(icon)}">`);

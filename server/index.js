@@ -28,6 +28,11 @@ app.get('/api/health', (_req, res) => {
 
 app.get('/api/clients', (_req, res) => res.json({ clients }));
 
+// Voice: AssemblyAI token + Claude understanding. Same code as the Vercel functions in /api.
+const voice = require('./voice');
+app.get(['/api/voice-token', '/api/voice-token/'], async (_req, res) => { const r = await voice.token(); res.set('Cache-Control', 'no-store').status(r.status).json(r.body); });
+app.post(['/api/voice-parse', '/api/voice-parse/'], async (req, res) => { const r = await voice.understand(req.body); res.set('Cache-Control', 'no-store').status(r.status).json(r.body); });
+
 // Draft a note. Body: { clientId, jottings }. The jottings arrive already stripped of
 // identifiers by the browser; the server strips nothing and stores nothing.
 app.post('/api/draft', async (req, res) => {
