@@ -246,6 +246,7 @@
   .vheard:not(.quote){font:500 15px/1.45 var(--ui);color:var(--ink-2)}
   .vheard.quote{font-style:italic}
   .vwave{display:block;width:100%;height:64px;pointer-events:none}
+  .vquick{gap:6px} .vquick .chip{min-height:32px;font-size:13px;padding:2px 10px;background:color-mix(in srgb,var(--mist) 70%,transparent);border:1px solid color-mix(in srgb,var(--ink) 10%,transparent);color:var(--ink);cursor:pointer}
   .vtype{display:flex;gap:6px} .vtype input{flex:1;height:44px;border:1px solid color-mix(in srgb,var(--ink) 14%,transparent);border-radius:999px;padding:0 14px;background:color-mix(in srgb,var(--mist) 70%,transparent);color:var(--ink);font:inherit} .vtype input::placeholder{color:var(--ink-2)}
   .vtype .sm{background:#81E40A;color:#0B0D0B;border:0;border-radius:999px;padding:0 18px;font-weight:900;min-height:44px}
   .plan{width:100%;max-width:720px;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1.5px solid #81E40A;border-radius:22px;padding:14px 16px;display:grid;gap:8px;color:var(--ink);box-shadow:0 14px 40px rgba(0,0,0,.2)}
@@ -460,6 +461,7 @@
     <div class="vhd"><b id="vTitle">Listening…</b><button class="sm" id="vClose" aria-label="close">✕</button></div>
     <div class="vheard" id="vHeard">Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".</div>
     <canvas class="vwave" id="vWave" aria-hidden="true"></canvas>
+    <div class="chips vquick" id="vQuick"><span class="muted" style="font-size:12px;font-weight:800;align-self:center">Try:</span><button class="chip small" data-say="blood pressure 120 over 80 for Robert">BP 120/80 for Robert</button><button class="chip small" data-say="Dolores took her meds">Dolores took her meds</button><button class="chip small" data-say="flag Marcus for a doctor">Flag Marcus for a doctor</button></div>
     <div class="vtype"><input type="text" id="vText" placeholder="…or type it here"><button class="sm" id="vGo">Go</button></div>
   </div>
 </div>
@@ -743,12 +745,20 @@
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, listening=false;
   const vBox=$('#voice'), vHeard=$('#vHeard'), vPlan=$('#vPlan'), vTitle=$('#vTitle');
   function words2num(s){ const W={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90,hundred:100}; let r=s.replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred)(?:[ -](one|two|three|four|five|six|seven|eight|nine))?\b/gi,(m,a,b)=>{let n=W[a.toLowerCase()]; if(b) n+=W[b.toLowerCase()]; return String(n);}); r=r.replace(/\b(\d) 100 (\d{1,2})\b/g,(m,a,b)=>String(+a*100+ +b)).replace(/\b(\d) 100\b/g,(m,a)=>String(+a*100)).replace(/\b(\d) (\d{2})\b/g,(m,a,b)=>a+b).replace(/\b(\d{2}) (\d)\b(?! over| \/)/g,(m,a,b)=>a+b); return r; }
-  function findClient(t){
-    for(const c of S.clients){ const first=c.display.split(' · ')[0].toLowerCase(); if(new RegExp('\\b'+first+'\\b','i').test(t)) return c; const room=(c.display.match(/Room (\d+)/)||[])[1]; if(room&&new RegExp('\\b(room|bed|rm)\\s*'+room+'\\b','i').test(t)) return c; }
-    return null;
+  // forgiving name match: accents, possessives, aliases, room numbers, and near-misses the mic makes ("Delores", "Roberts", "Hector")
+  const fold=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  function lev(a,b){ const m=a.length,n=b.length; if(!m||!n) return m||n; let prev=[...Array(n+1).keys()]; for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; } return prev[n]; }
+  function clientCandidates(t){
+    const toks=fold(t).replace(/'s\b/g,'').split(/[^a-z0-9]+/).filter(Boolean); const out=[];
+    for(const c of S.clients){ const names=[c.display.split(' · ')[0],...(c.names||[])].map(fold); const room=(c.display.match(/Room (\d+)/)||[])[1];
+      let best=9; names.forEach(nm=>toks.forEach(tk=>{ if(tk===nm) best=0; else if(tk.length>=4&&nm.length>=4){ const d=lev(tk,nm); if(d<best) best=d; } }));
+      if(room&&new RegExp('\\b(room|bed|rm)\\s*'+room+'\\b').test(fold(t))) best=0;
+      if(best<=2) out.push({c,d:best}); }
+    return out.sort((a,b)=>a.d-b.d).map(x=>x.c);
   }
+  function findClient(t){ const cs=clientCandidates(t); return cs.length&&(cs.length===1||clientCandidates(t).filter(x=>x===cs[0]).length)?cs[0]:null; }
   function parse(raw){
-    const t=words2num(String(raw||'').toLowerCase().replace(/[.,!?]/g,' ').replace(/\s+/g,' ').trim());
+    const t=words2num(String(raw||'').toLowerCase().replace(/[,!?]|\.(?!\d)/g,' ').replace(/\s+/g,' ').trim());
     const named=findClient(t); const c=named||S.client; const who=c?c.display:null; const cur=latestOpen();
     let m;
     if((m=t.match(/(?:blood pressure|bp|pressure)\D*(\d{2,3})\s*(?:over|\/|by|on)?\s*(\d{2,3})/))) return {kind:'line',c,text:`BP ${m[1]}/${m[2]}`,what:`Log blood pressure ${m[1]}/${m[2]}`,vitals:true};
@@ -769,14 +779,18 @@
     if(/\b(note|add|write)\b/.test(t)) { const q=t.replace(/^.*?\b(note|add|write)(?: down| that)?\b\s*/,''); return q?{kind:'line',c,text:q,what:`Add to sheet: "${q}"`}:{kind:'unsure',what:"Didn't catch what to add"}; }
     return {kind:'unsure',what:"Didn't understand that one",raw:t};
   }
+  let lastRaw='';
   function showPlan(p){
     const needC=['line','pass','flag'].includes(p.kind)&&!p.c;
-    vPlan.innerHTML=`<div class="plan ${p.kind==='unsure'||needC?'unsure':''}"><div class="what">${esc(p.what)}</div><div class="who">${p.c?'for '+esc(p.c.display):needC?'Who is this for? Say a name or a room, or open a bed first.':''}</div>
+    const cands=needC?S.clients.slice(0,15):[];
+    vPlan.innerHTML=`<div class="plan ${p.kind==='unsure'||needC?'unsure':''}"><div class="what">${esc(p.what)}</div><div class="who">${p.c?'for '+esc(p.c.display):needC?'Who is this for? Tap a name:':''}</div>
+      ${needC?`<div class="chips" style="margin:4px 0 6px">${cands.map(c=>`<button class="chip small" data-who="${c.id}">${esc(c.display.split(' · ')[0])} · ${esc(c.display.split(' · ')[1].replace('Room ','Rm '))}</button>`).join('')}</div>`:''}
       ${p.kind!=='unsure'&&!needC?`<div class="btns"><button class="btn main" id="vDo">Do it</button><button class="btn" id="vNo">No</button></div>`:`<div class="btns"><button class="btn" id="vAgain">Try again</button></div>`}
       <div class="muted" style="font-size:12px">Nothing happens until you tap. Rounds only does the actions it understood.</div></div>`;
     const d=$('#vDo'); if(d) d.onclick=()=>{ act(p); vPlan.innerHTML=''; closeVoice(); };
     const n=$('#vNo'); if(n) n.onclick=()=>{ vPlan.innerHTML=''; startListen(); };
     const a=$('#vAgain'); if(a) a.onclick=()=>{ vPlan.innerHTML=''; startListen(); };
+    vPlan.querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{ const c=S.clients.find(x=>x.id===b.dataset.who); showPlan(Object.assign({},p,{c})); });
   }
   function act(p){
     const iconOf=t=>iconFor(t,'');
@@ -809,21 +823,27 @@
     async function listenAudio(){ try{ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return; stream=await navigator.mediaDevices.getUserMedia({audio:true}); ac=new (window.AudioContext||window.webkitAudioContext)(); an=ac.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6; buf=new Uint8Array(an.fftSize); ac.createMediaStreamSource(stream).connect(an); }catch(e){ an=null; } }
     return { start(){ if(!cv) return; ctx=cv.getContext('2d'); size(); window.addEventListener('resize',size); cancelAnimationFrame(raf); if(matchMedia('(prefers-reduced-motion: reduce)').matches){ level=0.15; draw(); cancelAnimationFrame(raf); return; } draw(); listenAudio(); },
       stop(){ cancelAnimationFrame(raf); window.removeEventListener('resize',size); if(stream){ stream.getTracks().forEach(tr=>tr.stop()); stream=null; } if(ac){ try{ac.close();}catch(e){} ac=null; } an=null; if(ctx) ctx.clearRect(0,0,cv.width,cv.height); } }; })();
+  let noSpeechRetried=false, finalTimer=null;
   function startListen(){
     if(!SR){ vTitle.textContent='Type what you\'d say'; vHeard.textContent='This browser has no speech recognition. Typing works the same way.'; $('#vText').focus(); return; }
-    try{ rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=1;
+    try{ rec=new SR(); rec.lang='en-US'; rec.interimResults=true; rec.maxAlternatives=3; let heard='';
       rec.onstart=()=>{ listening=true; $('#micBtn').classList.add('on'); vTitle.textContent='Listening…'; };
-      rec.onresult=e=>{ let t=''; for(const r of e.results) t+=r[0].transcript; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); if(e.results[e.results.length-1].isFinal){ showPlan(parse(t)); } };
-      rec.onerror=e=>{ vTitle.textContent='Couldn\'t hear'; vHeard.textContent=(e.error==='not-allowed'?'Microphone is blocked for this page. Typing works the same way.':'Try again, or type it.'); stopListen(); };
+      rec.onresult=e=>{ let t=''; for(const r of e.results) t+=r[0].transcript; heard=t; lastRaw=t; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); clearTimeout(finalTimer);
+        if(e.results[e.results.length-1].isFinal){ showPlan(parse(t)); try{rec.stop();}catch(_){} }
+        else finalTimer=setTimeout(()=>{ if(heard){ showPlan(parse(heard)); try{rec.stop();}catch(_){} } },1400); };
+      rec.onerror=e=>{ if(e.error==='no-speech'&&!noSpeechRetried){ noSpeechRetried=true; vTitle.textContent='Still listening…'; setTimeout(startListen,150); return; }
+        if(e.error==='aborted') return;
+        vTitle.textContent=e.error==='not-allowed'?'Mic is blocked':'Couldn\'t hear'; vHeard.classList.remove('quote'); vHeard.textContent=(e.error==='not-allowed'?'Microphone is blocked for this page. Tap an example below, or type it.':'Tap an example below, or type it.'); stopListen(); $('#vText').focus(); };
       rec.onend=()=>stopListen();
       rec.start();
     }catch(e){ vTitle.textContent='Type what you\'d say'; }
   }
   function stopListen(){ listening=false; $('#micBtn').classList.remove('on'); }
   function closeVoice(){ vBox.hidden=true; wave.stop(); if(rec){ try{rec.stop();}catch(e){} } stopListen(); }
-  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } vBox.hidden=false; wave.start(); vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".'; $('#vText').value=''; startListen(); };
+  $('#micBtn').onclick=()=>{ if(!vBox.hidden&&listening){ closeVoice(); return; } vBox.hidden=false; wave.start(); noSpeechRetried=false; vPlan.innerHTML=''; vHeard.classList.remove('quote'); vHeard.textContent='Say something like "blood pressure 120 over 80 for Robert", "Dolores took her meds", or "flag Marcus for a doctor".'; $('#vText').value=''; startListen(); };
   $('#vClose').onclick=closeVoice; vBox.addEventListener('click',e=>{ if(e.target===vBox) closeVoice(); });
   const typed=()=>{ const t=$('#vText').value.trim(); if(!t) return; vHeard.textContent='“'+t+'”'; vHeard.classList.add('quote'); showPlan(parse(t)); };
+  document.querySelectorAll('#vQuick [data-say]').forEach(b=>b.onclick=()=>{ if(rec){try{rec.stop();}catch(_){}} $('#vText').value=b.dataset.say; typed(); });
   $('#vGo').onclick=typed; $('#vText').addEventListener('keydown',e=>{ if(e.key==='Enter') typed(); });
 
   function showDraft(kind){ const t=draftText(kind); const box=$('#draftbox'); box.hidden=false; box.textContent=t; const ok=()=>toast('Copied.'); if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok).catch(()=>fb(t,ok)); else fb(t,ok); }
