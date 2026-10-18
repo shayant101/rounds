@@ -509,7 +509,23 @@
 
   // ---- boot
   fetch('/api/clients').then(r=>r.json()).then(d=>{S.clients=d.clients; boot();});
-  function boot(){
+
+  // ---- demo day: on a fresh device (or after Reset demo) seed a realistic shift so every state is visible: taken, missed, side effect, pending, flags, signed notes.
+  function seedDemo(){
+    if(store.get('log.'+today,null)) return;
+    const open=c=>(c.passes||[]).filter(isOpen); const cur=latestOpen(); const log={}, flags={}, done=store.get('done',{});
+    const byId=Object.fromEntries(S.clients.map(c=>[c.id,c]));
+    const caught=['elena','samuel','aisha','linh','tomas','grace','walter','nadia'];
+    S.clients.forEach(c=>{ const o=open(c); if(!o.length) return; log[c.id]={};
+      o.forEach(p=>{ if(p!==cur||caught.includes(c.id)) log[c.id][p]='took'; });
+    });
+    const set=(id,i,st,note)=>{ const c=byId[id]; if(!c) return; const o=open(c); const p=o[i]; if(!p) return; log[id]=log[id]||{}; log[id][p]=st; if(note) log[id][p+':note']=note; };
+    set('dolores',0,'missed'); set('hector',1,'missed'); set('marcus',0,'side','dizzy after, sat him down'); set('yesenia',0,'missed');
+    flags.marcus={doctor:true}; flags.robert={ready:true,vitals:true}; flags.grace={vitals:true}; flags.elena={vitals:true,appt:true}; flags.samuel={vitals:true}; flags.walter={ready:true,vitals:true}; flags.linh={vitals:true};
+    done.elena=true; done.samuel=true;
+    store.set('log.'+today,log); store.set('flags.'+today,flags); store.set('done',done); S.log=log; S.flags=flags; S.done=done;
+  }
+  function boot(){ seedDemo();
     const STAFF=[{name:'Maria',full:'Maria Lopez',role:'LVN · day shift'},{name:'James',full:'James Okafor',role:'Medical assistant · day shift'},{name:'Priya',full:'Priya Nair',role:'LVN · night shift'}];
     if(!S.profile){ $('#hello').hidden=false; $('#staff').innerHTML=STAFF.map(p=>`<button class="person" data-staff="${esc(p.name)}"><span class="av">${esc(p.full.split(' ').map(w=>w[0]).join(''))}</span><span><b>${esc(p.full)}</b><span>${esc(p.role)}</span></span></button>`).join('');
       $('#staff').querySelectorAll('[data-staff]').forEach(b=>b.onclick=()=>{ const p=STAFF.find(x=>x.name===b.dataset.staff); S.profile={name:p.name,full:p.full,role:p.role}; store.set('profile',S.profile); $('#hello').hidden=true; showApp(true); }); }
