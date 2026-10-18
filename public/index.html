@@ -780,12 +780,14 @@
       else target=0.08+0.05*Math.sin(t*0.9);
       level+= (target-level)*0.12; t+=0.035;
       const base=H*0.5, amp=H*(0.08+0.4*level);
-      const light=document.documentElement.getAttribute('data-theme')==='light'; ctx.globalCompositeOperation=light?'source-over':'screen';
-      COLS.forEach((c,i)=>{ const ph=t*(1+i*0.23)+i*1.7, f=(1.6+i*0.5)/W*Math.PI*2; ctx.beginPath();
-        for(let x=0;x<=W;x+=4*r){ const env=Math.sin(Math.PI*x/W); const y=base+Math.sin(x*f+ph)*amp*env*(1-i*0.12)+Math.sin(x*f*0.5-ph*0.7)*amp*0.35*env; if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
-        ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); const g=ctx.createLinearGradient(0,base-amp,0,H); g.addColorStop(0,c+'22'); g.addColorStop(1,c+'00'); ctx.fillStyle=g; ctx.fill();
-        ctx.beginPath(); for(let x=0;x<=W;x+=4*r){ const env=Math.sin(Math.PI*x/W); const y=base+Math.sin(x*f+ph)*amp*env*(1-i*0.12)+Math.sin(x*f*0.5-ph*0.7)*amp*0.35*env; if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
-        ctx.strokeStyle=c; ctx.lineWidth=(light?2.6:2)*r; ctx.shadowColor=c; ctx.shadowBlur=(light?3:8)*r; ctx.stroke(); ctx.shadowBlur=0; });
+      const light=document.documentElement.getAttribute('data-theme')==='light';
+      const GREENS=light?['#5FAE00','#81E40A','#2E6B0A','#A9EE5C']:['#81E40A','#B5F26B','#4F9A0A','#DAFBB0'];
+      ctx.globalCompositeOperation=light?'source-over':'lighter';
+      GREENS.forEach((c,i)=>{ const ph=t*(1+i*0.21)+i*1.9, f=(1.4+i*0.45)/W*Math.PI*2, step=(i%2?11:8)*r;
+        for(let x=0;x<=W;x+=step){ const env=Math.sin(Math.PI*x/W); const y=base+Math.sin(x*f+ph)*amp*env*(1-i*0.14)+Math.sin(x*f*0.5-ph*0.7)*amp*0.3*env;
+          const rad=(0.9+1.6*env*(0.4+level)+(i===0?0.6:0))*r; ctx.beginPath(); ctx.arc(x,y,rad,0,Math.PI*2); ctx.fillStyle=c; ctx.globalAlpha=0.35+0.55*env; ctx.shadowColor=c; ctx.shadowBlur=(light?2:6)*r; ctx.fill(); }
+      });
+      ctx.globalAlpha=1; ctx.shadowBlur=0;
       ctx.globalCompositeOperation='source-over'; raf=requestAnimationFrame(draw); }
     async function listenAudio(){ try{ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) return; stream=await navigator.mediaDevices.getUserMedia({audio:true}); ac=new (window.AudioContext||window.webkitAudioContext)(); an=ac.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6; buf=new Uint8Array(an.fftSize); ac.createMediaStreamSource(stream).connect(an); }catch(e){ an=null; } }
     return { start(){ if(!cv) return; ctx=cv.getContext('2d'); size(); window.addEventListener('resize',size); cancelAnimationFrame(raf); if(matchMedia('(prefers-reduced-motion: reduce)').matches){ level=0.15; draw(); cancelAnimationFrame(raf); return; } draw(); listenAudio(); },
